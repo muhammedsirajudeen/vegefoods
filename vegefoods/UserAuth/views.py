@@ -9,4 +9,4 @@ def user_login(request):
 
 
 def user_home(request):
-    return render(request,'index.html')
+    return render(request,'category.html')
