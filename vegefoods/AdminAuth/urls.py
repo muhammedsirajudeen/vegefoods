@@ -20,6 +20,6 @@ from AdminAuth import views
 
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('adminauth/',include('AdminAuth')),
+    path('login/',views.admin_login,name='admin_login'),
+    path('panel/',views.panel,name='panel'),
 ]

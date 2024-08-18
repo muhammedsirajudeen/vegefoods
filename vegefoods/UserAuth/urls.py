@@ -20,8 +20,9 @@ from UserAuth import views
 
 
 urlpatterns = [
+    path('home/', views.user_home, name='home'),
     path('signup/', views.user_registration, name='signup'),
     path('login/', views.user_login, name='login'),
-    path('home/', views.user_home, name='home'),
+    path('logout/', views.user_logout, name='logout'),
 
 ]
