@@ -16,11 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from UserAuth import views
 
 urlpatterns = [
     path('adminn/', admin.site.urls),
     path('accounts/', include('allauth.urls')),
     path('admin/', include('AdminAuth.urls')),
     path('user/', include('UserAuth.urls')),
+    path('categories/', include('category_app.urls')),
+    path('products/', include('product_app.urls')),
+    
+    path('', views.redirect_to_home),  # Redirect root URL to /user/home
 ]
 

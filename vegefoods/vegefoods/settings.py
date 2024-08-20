@@ -15,6 +15,12 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+#Cloudianry imports
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -44,6 +50,9 @@ INSTALLED_APPS = [
     'allauth.account',
     'allauth.socialaccount',
     'allauth.socialaccount.providers.google',
+    'cloudinary',
+    'category_app',
+    'product_app',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
@@ -76,7 +85,6 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': ['templates',
-                    'AdminAuth/templates'
                  ],
         'APP_DIRS': True,
         'OPTIONS': {
@@ -148,6 +156,21 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'mrak4579@gmail.com'  # Replace with your Gmail address
+EMAIL_HOST_PASSWORD = 'xxgs jhvk ztno khwk'  # Replace with the generated app password
+
+
+cloudinary.config(
+    cloud_name ="dwrd1g9wg",
+    api_key ="688376963313197",
+    api_secret ="G5TQ9PyDwNPr58ezl_QeWHsF5HI",
+)
 
 AUTHENTICATION_BACKENDS = [
     'django.contrib.auth.backends.ModelBackend',  # Keep this for regular authentication

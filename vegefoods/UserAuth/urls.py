@@ -24,5 +24,8 @@ urlpatterns = [
     path('signup/', views.user_registration, name='signup'),
     path('login/', views.user_login, name='login'),
     path('logout/', views.user_logout, name='logout'),
+    path('verify-otp/<int:user_id>/', views.verify_otp, name='verify_otp'),
+    
+    
 
 ]

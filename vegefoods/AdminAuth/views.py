@@ -1,6 +1,6 @@
 from django.shortcuts import render,redirect
 from django.contrib.auth import authenticate, login
-
+from django.contrib.auth.models import User
 # Create your views here.
 def admin_login(request):
     if request.method == 'POST':
@@ -13,9 +13,17 @@ def admin_login(request):
         else:
             # Handle invalid login
             return render(request, 'admin_login.html', {'error': 'Invalid credentials or access denied'})
-    return render(request, 'admin_login.html')
+    return render(request, 'admin/admin_login.html')
 
 def panel(request):
     if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect('admin_login')  # Redirect to login if not authenticated or not staff
-    return render(request, 'dashboard.html')  # Replace with actual panel template
+        return redirect('admin/admin_login')  
+    return render(request, 'admin/dashboard.html')  
+
+def user_managment(request):
+    users = User.objects.filter(is_superuser =  False).order_by('username')
+    return render(request,'admin/users.html',{'users':users})
+
+
+
+
