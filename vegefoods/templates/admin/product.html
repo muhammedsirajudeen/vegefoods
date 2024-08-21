@@ -90,7 +90,7 @@
                             <td>{{ product.product_name }}</td>
                             <td>{{ product.category }}</td>
                             <td>{{ product.price }}</td>
-                            <td>{{ product.available_stock }}</td>
+                            <td>{{ product.available_stock }}{{ product.category.category_unit }}</td>
                             <td><img src="{{ product.image_1.url }}" alt="Image 1" width="50"></td>
                             <td><img src="{{ product.image_2.url }}" alt="Image 2" width="50"></td>
                             <td><img src="{{ product.image_3.url }}" alt="Image 3" width="50"></td>

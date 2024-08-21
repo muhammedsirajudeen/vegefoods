@@ -1,4 +1,5 @@
 from django.shortcuts import render,redirect
+from django.contrib.auth.views import PasswordResetView
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
 from django.contrib.auth.decorators import login_required
@@ -100,4 +101,12 @@ def user_logout(request):
 
 
 
-
+class CustomPasswordResetView(PasswordResetView):
+    def form_valid(self, form):
+        email = form.cleaned_data.get('email')
+        if not User.objects.filter(email=email).exists():
+            return render(self.request, 'user/password_reset_form.html', {
+                'form': form,
+                'error': 'No account found with this email address.'
+            })
+        return super().form_valid(form)

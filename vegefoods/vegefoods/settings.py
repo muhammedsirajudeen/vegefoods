@@ -52,7 +52,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'cloudinary',
     'category_app',
-    'product_app',
+    'product_apps',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
