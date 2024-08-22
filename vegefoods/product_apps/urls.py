@@ -21,8 +21,10 @@ from product_apps import views
 
 urlpatterns = [
     path('product_management/',views.product_list, name='product_management'),
-    path('edit_product/<int:product_id>/',views.edit_product, name='edit_product'),
-
+    path('edit_product/<int:product_id>/', views.edit_product, name='edit_product'),    
+    path('product_view/',views.user_products, name='user_products'),
+    path('product_details/<int:product_id>/',views.product_details, name='product_details'),
+    
     
     
 ]

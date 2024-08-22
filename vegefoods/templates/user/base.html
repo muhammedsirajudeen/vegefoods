@@ -58,18 +58,18 @@
     </div>
     <nav class="navbar navbar-expand-lg navbar-dark ftco_navbar bg-dark ftco-navbar-light" id="ftco-navbar">
 		<div class="container">
-			<a class="navbar-brand" href="index.html">Vegefoods</a>
+			<a class="navbar-brand" href="{%  url 'home' %}">Vegefoods</a>
 			<button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#ftco-nav" aria-controls="ftco-nav" aria-expanded="false" aria-label="Toggle navigation">
 				<span class="oi oi-menu"></span> Menu
 			</button>
 	
 			<div class="collapse navbar-collapse" id="ftco-nav">
 				<ul class="navbar-nav ml-auto">
-					<li class="nav-item"><a href="index.html" class="nav-link">Home</a></li>
+					<li class="nav-item"><a href="{%  url 'home' %}" class="nav-link">Home</a></li>
 					<li class="nav-item active dropdown">
 						<a class="nav-link dropdown-toggle" href="#" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Shop</a>
 						<div class="dropdown-menu" aria-labelledby="dropdown04">
-							<a class="dropdown-item" href="shop.html">Shop</a>
+							<a class="dropdown-item" href="{%  url 'user_products' %}">Shop</a>
 							<a class="dropdown-item" href="wishlist.html">Wishlist</a>
 							<a class="dropdown-item" href="product-single.html">Single Product</a>
 							<a class="dropdown-item" href="cart.html">Cart</a>
@@ -87,7 +87,7 @@
                             {{username}}                           
                             {% else %}
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            User
+                            My Account
                             {% endif %}
                         </a>
 						<div class="dropdown-menu" aria-labelledby="userDropdown">
@@ -180,7 +180,7 @@
                 <div class="col-md-12 text-center">
 
                     <p><!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
-                        Copyright &copy; 2023 All rights reserved | This template is made with <i class="icon-heart color-danger" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank">Colorlib.com</a>
+                        Copyright &copy; 2024 All rights reserved</a>
                         <!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
                     </p>
                 </div>
@@ -203,6 +203,65 @@
     <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
     <script src="{% static 'js/scrollax.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>
-
+    <script>
+        $(document).ready(function(){
+        
+            // Function to update the quantity field with the correct unit
+            function updateQuantity(quantity, unit) {
+                $('#quantity').val(quantity + " " + unit);
+            }
+        
+            // Function to parse the numeric part of the input value
+            function parseQuantity() {
+                var quantity = $('#quantity').val().split(" ")[0]; // Get the numeric part
+                return parseFloat(quantity); // Parse float to handle decimal numbers
+            }
+        
+            // Event handler for increment button
+            $('.quantity-right-plus').click(function(e){
+                e.preventDefault();
+                var quantity = parseQuantity();
+                var unit = "{{ product.category.category_unit }}"; // Replace with your actual unit variable
+        
+                // Adjust the increment based on the unit
+                if (unit === "kg") {
+                    if (quantity < 10) {
+                        quantity += 0.5;
+                    }
+                } else if (unit === "g") {
+                    if (quantity < 500) {
+                        quantity += 50;
+                    }
+                } else if (unit === "packet") {
+                    if (quantity === 1) {
+                        quantity = 6;
+                    }
+                }
+        
+                updateQuantity(quantity, unit);
+            });
+        
+            // Event handler for decrement button
+            $('.quantity-left-minus').click(function(e){
+                e.preventDefault();
+                var quantity = parseQuantity();
+                var unit = "{{ product.category.category_unit }}"; // Replace with your actual unit variable
+        
+                // Adjust the decrement based on the unit
+                if (unit === "kg" && quantity > 0.5) {
+                    quantity -= 0.5;
+                } else if (unit === "g" && quantity > 100) {
+                    quantity -= 50;
+                } else if (unit === "packet" && quantity === 6) {
+                    quantity = 1;
+                }
+        
+                updateQuantity(quantity, unit);
+            });
+            
+        });
+        </script>
+        
+       
 </body>
 </html>

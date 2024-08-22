@@ -53,6 +53,7 @@ INSTALLED_APPS = [
     'cloudinary',
     'category_app',
     'product_apps',
+    'crispy_forms',
 ]
 
 SOCIALACCOUNT_PROVIDERS = {

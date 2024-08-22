@@ -20,6 +20,15 @@
     <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="{% static 'admin/images/favicon.png' %}" />
+    <!-- Cropper.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.css">
+
+<!-- Cropper.js CSS -->
+<link  href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
+
+<!-- Cropper.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
   </head>
   <body>
     <div class="container-scroller">
@@ -96,10 +105,10 @@
                             <td><img src="{{ product.image_3.url }}" alt="Image 3" width="50"></td>
                             <td>{{ product.offer}}</td>
                             <td>
-                              <button class="btn btn-primary" data-toggle="modal" data-target="#editProductModal{{ product.id }}">
+                              <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">
                                 Edit
-                              </button>
-                                                            <button class="btn btn-outline-danger btn-sm" style="padding: 10px 20px;">List</button>
+                              </a>
+                              <button class="btn btn-outline-danger btn-sm" style="padding: 10px 20px;">List</button>
                             </td>
                           </tr>
 
@@ -148,25 +157,95 @@
           <!-- Create New Category Modal -->
           <div class="modal fade" id="createProductModal" tabindex="-1" aria-labelledby="createProductModalLabel" aria-hidden="true">
             <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="createProductModalLabel">Create New Product</h5>
-                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                  </button>
-                </div>
-                <div class="modal-body">
-                  <form id="createProductForm" method="POST" enctype="multipart/form-data">
-                    {% csrf_token %}
-                    {{ form.as_p }}
-                    <button type="submit" class="btn btn-success">Create Product</button>
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                </form>
-                </div>
-              </div>
-            </div>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createProductModalLabel">Create New Product</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Form for creating a product -->
+                        <!-- Form for creating a product -->
+<form id="createProductForm" method="POST" enctype="multipart/form-data">
+  {% csrf_token %}
+  <div class="form-group">
+      {{ form.product_name.label_tag }}
+      {{ form.product_name }}
+  </div>
+  <div class="form-group">
+      {{ form.description.label_tag }}
+      {{ form.description }}
+  </div>
+  <div class="form-group">
+      {{ form.category.label_tag }}
+      {{ form.category }}
+  </div>
+  <div class="form-group">
+      {{ form.available_stock.label_tag }}
+      {{ form.available_stock }}
+  </div>
+  <div class="form-group">
+      {{ form.price.label_tag }}
+      {{ form.price }}
+  </div>
+  <div class="form-group">
+      {{ form.offer.label_tag }}
+      {{ form.offer }}
+  </div>
+  <div class="form-group">
+      {{ form.image_1.label_tag }}
+      <input type="file" id="image1Input" name="image_1" accept="image/*">
+      <div class="image-preview">
+          <img id="image1Preview" style="max-width: 100%; margin-top: 10px; display: none;">
+          <button type="button" id="cropImage1Button" class="btn btn-primary" style="display: none;">Crop</button>
+      </div>
+  </div>
+  <div class="form-group">
+      {{ form.image_2.label_tag }}
+      <input type="file" id="image2Input" name="image_2" accept="image/*">
+      <div class="image-preview">
+          <img id="image2Preview" style="max-width: 100%; margin-top: 10px; display: none;">
+          <button type="button" id="cropImage2Button" class="btn btn-primary" style="display: none;">Crop</button>
+      </div>
+  </div>
+  <div class="form-group">
+      {{ form.image_3.label_tag }}
+      <input type="file" id="image3Input" name="image_3" accept="image/*">
+      <div class="image-preview">
+          <img id="image3Preview" style="max-width: 100%; margin-top: 10px; display: none;">
+          <button type="button" id="cropImage3Button" class="btn btn-primary" style="display: none;">Crop</button>
+      </div>
+  </div>
+  <button type="submit" class="btn btn-success">Create Product</button>
+  <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+</form>
+
+
+<!-- Modal for Image Cropping -->
+<div class="modal fade" id="cropImageModal" tabindex="-1" role="dialog" aria-labelledby="cropImageModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+      <div class="modal-content">
+          <div class="modal-header">
+              <h5 class="modal-title" id="cropImageModalLabel">Crop Image</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+              </button>
           </div>
-          
+          <div class="modal-body">
+              <div>
+                  <img id="cropImage" src="" alt="Image to crop" style="max-width: 100%;">
+              </div>
+          </div>
+          <div class="modal-footer">
+              <button type="button" id="cropImageButton" class="btn btn-primary">Crop</button>
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+      </div>
+  </div>
+</div>
+
+        
           <!-- End Create New Category Modal -->
 
         </div>
@@ -195,5 +274,71 @@
     <!-- Custom js for this page -->
     <script src="{% static 'admin/js/dashboard.js' %}"></script>
     <!-- End custom js for this page -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.12/cropper.min.js"></script>
+    <script>
+document.addEventListener('DOMContentLoaded', function () {
+    let cropper;
+    const cropImageModal = new bootstrap.Modal(document.getElementById('cropImageModal'));
+    const cropImageElement = document.getElementById('cropImage');
+    const cropImageButton = document.getElementById('cropImageButton');
+    const imagePreviews = document.querySelectorAll('.image-preview img');
+    const imageInputs = document.querySelectorAll('input[type="file"]');
+
+    function setupCropper() {
+        if (cropper) {
+            cropper.destroy();
+        }
+        cropper = new Cropper(cropImageElement, {
+            aspectRatio: 1,
+            viewMode: 1,
+            autoCropArea: 1
+        });
+    }
+
+    function handleImageInputChange(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                cropImageElement.src = e.target.result;
+                setupCropper();
+                cropImageModal.show();
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function handleCropImage() {
+        const croppedCanvas = cropper.getCroppedCanvas();
+        croppedCanvas.toBlob(function (blob) {
+            const fileInput = document.querySelector('input[type="file"][data-crop]');
+            const dataTransfer = new DataTransfer();
+            const newFile = new File([blob], 'cropped-image.jpg', { type: blob.type });
+            dataTransfer.items.add(newFile);
+            fileInput.files = dataTransfer.files;
+
+            // Update preview image
+            const imgIndex = Array.from(imageInputs).indexOf(fileInput);
+            if (imgIndex > -1) {
+                imagePreviews[imgIndex].src = URL.createObjectURL(newFile);
+                imagePreviews[imgIndex].style.display = 'block';
+            }
+        });
+        cropper.destroy();
+        cropImageModal.hide();
+    }
+
+    imageInputs.forEach((input, index) => {
+        input.addEventListener('change', function (e) {
+            handleImageInputChange(e);
+            this.setAttribute('data-crop', true);
+        });
+    });
+
+    cropImageButton.addEventListener('click', handleCropImage);
+});
+</script>
+
+    
   </body>
 </html>
