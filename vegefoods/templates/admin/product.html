@@ -105,10 +105,10 @@
                             <td><img src="{{ product.image_3.url }}" alt="Image 3" width="50"></td>
                             <td>{{ product.offer}}</td>
                             <td>
-                              <a href="{% url 'edit_product' product.id %}" class="btn btn-primary">
-                                Edit
+                              <a href="{% url 'edit_product' product.id %}" class="btn btn-success">Edit</a>
+                              <a href="{% url 'toggle_product_listing' product.id %}" class="btn {% if product.is_listed %}btn-outline-primary{% else %}btn-outline-secondary{% endif %}">
+                                {% if product.is_listed %} Unlist {% else %} Relist {% endif %}
                               </a>
-                              <button class="btn btn-outline-danger btn-sm" style="padding: 10px 20px;">List</button>
                             </td>
                           </tr>
 

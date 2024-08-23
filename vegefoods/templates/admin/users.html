@@ -50,60 +50,53 @@
             </div>
             
           
-             
             <div class="row">
-                <div class="col-12 grid-margin">
-                    <div class="card">
-                        <div class="card-body">
-                            <h4 class="card-title">Users</h4>
-                            <div class="table-responsive">
-                                <table class="table">
-                                    <thead>
-                                        <tr>
-                                            <th>
-                                                <div class="form-check form-check-muted m-0">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input">
-                                                    </label>
-                                                </div>
-                                            </th>
-                                            <th>User Name</th>
-                                            <th>First Name</th>
-                                            <th>Last Name</th>
-                                            <th>Email</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <!-- Loop through users -->
-                                        {% for user in users %}
-                                        <tr>
-                                            <td>
-                                                <div class="form-check form-check-muted m-0">
-                                                    <label class="form-check-label">
-                                                        <input type="checkbox" class="form-check-input">
-                                                    </label>
-                                                </div>
-                                            </td>
-                                            <td>{{user.username}}</td>
-                                            <td> {{user.first_name}}</td>
-                                            <td>{{user.last_name}}</td>
-                                            <td>{{user.email}}</td>
-                                            <td>
-                                                <!-- Action buttons -->
-                                                 <button type="submit"  class="badge badge-outline-primary">Block</button>
-                                                                                     
-                                            </td>
-                                        </tr>
-                                       {% endfor %}
-                                    </tbody>
-                          
-                      </table>
-                    </div>
+              <div class="col-12 grid-margin">
+                  <div class="card">
+                      <div class="card-body">
+                          <h4 class="card-title">Users</h4>
+                          <div class="table-responsive">
+                              <table class="table">
+                                  <thead>
+                                      <tr>
+                                          <th>Id</th>
+                                          <th>User Name</th>
+                                          <th>First Name</th>
+                                          <th>Last Name</th>
+                                          <th>Email</th>
+                                          <th>Action</th>
+                                      </tr>
+                                  </thead>
+                                  <tbody>
+                                      <!-- Loop through users -->
+                                      {% for user in users %}
+                                      <tr>
+                                          <td>{{ user.id }}</td>
+                                          <td>{{ user.username }}</td>
+                                          <td>{{ user.first_name }}</td>
+                                          <td>{{ user.last_name }}</td>
+                                          <td>{{ user.email }}</td>
+                                          <td>
+                                              <!-- Action buttons -->
+                                              <form method="post" action="{% url 'block_unblock_user' user.id %}" style="display: inline;">
+                                                  {% csrf_token %}
+                                                  {% if user.is_active %}
+                                                      <button type="submit" name="action" value="block" class="btn btn-outline-primary btn-sm">Block</button>
+                                                  {% else %}
+                                                      <button type="submit" name="action" value="unblock" class="btn btn-outline-success btn-sm">Unblock</button>
+                                                  {% endif %}
+                                              </form>
+                                          </td>
+                                      </tr>
+                                      {% endfor %}
+                                  </tbody>
+                              </table>
+                          </div>
+                      </div>
                   </div>
-                </div>
               </div>
-            </div>
+          </div>
+          
           
           <!-- partial:partials/_footer.html -->
           <!-- <footer class="footer">

@@ -39,60 +39,62 @@
             <div class="card-body p-4">
               <h2 class="h3 mb-4">Registration</h2>
               <p class="fs-6 text-secondary mb-4">Enter your details to register</p>
-              <form action="" method="POST">
+              <form action="" method="POST" id="registrationForm">
                 {% csrf_token %}
                 <div class="row g-3">
                   <div class="col-12">
-                    <div class="form-floating">
-                      <input type="text" class="form-control" name="username" id="username" placeholder="Username" required>
-                      <label for="username" class="form-label">Username</label>
-                    </div>
+                      <div class="form-floating">
+                          <input type="text" class="form-control {% if errors.username_error %}is-invalid{% endif %}" name="username" id="username" placeholder="Username" required>
+                          <label for="username" class="form-label">Username</label>
+                          {% if errors.username_error %}
+                              <div class="invalid-feedback">{{ errors.username_error }}</div>
+                          {% endif %}
+                          <div class="invalid-feedback" id="usernameError" style="display: none;">Username must be 4-20 characters long and can only contain letters, numbers, and underscores.</div>
+                      </div>
                   </div>
-                  <div class="col-12 col-md-6">
-                    <div class="form-floating">
-                      <input type="text" class="form-control" name="firstName" id="firstName" placeholder="First Name" required>
-                      <label for="firstName" class="form-label">First Name</label>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" name="firstName" id="firstName" placeholder="First Name" required>
+                            <label for="firstName" class="form-label">First Name</label>
+                        </div>
                     </div>
-                  </div>
-                  <div class="col-12 col-md-6">
-                    <div class="form-floating">
-                      <input type="text" class="form-control" name="lastName" id="lastName" placeholder="Last Name" required>
-                      <label for="lastName" class="form-label">Last Name</label>
+                    <div class="col-12 col-md-6">
+                        <div class="form-floating">
+                            <input type="text" class="form-control" name="lastName" id="lastName" placeholder="Last Name" required>
+                            <label for="lastName" class="form-label">Last Name</label>
+                        </div>
                     </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="form-floating">
-                      <input type="email" class="form-control" name="email" id="email" placeholder="name@example.com" required>
-                      <label for="email" class="form-label">Email</label>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="email" class="form-control {% if errors.email_error %}is-invalid{% endif %}" name="email" id="email" placeholder="name@example.com" required>
+                            <label for="email" class="form-label">Email</label>
+                            {% if errors.email_error %}
+                                <div class="invalid-feedback">{{ errors.email_error }}</div>
+                            {% endif %}
+                        </div>
                     </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="form-floating">
-                      <input type="password" class="form-control" name="password1" id="password" placeholder="Password" required>
-                      <label for="password" class="form-label">Password</label>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="password" class="form-control {% if errors.password_error %}is-invalid{% endif %}" name="password1" id="password" placeholder="Password" required>
+                            <label for="password" class="form-label">Password</label>
+                            {% if errors.password_error %}
+                                <div class="invalid-feedback">{{ errors.password_error }}</div>
+                            {% endif %}
+                        </div>
                     </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="form-floating">
-                      <input type="password" class="form-control" name="password2" id="confirmPassword" placeholder="Confirm Password" required>
-                      <label for="confirmPassword" class="form-label">Confirm Password</label>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="password" class="form-control" name="password2" id="confirmPassword" placeholder="Confirm Password" required>
+                            <label for="confirmPassword" class="form-label">Confirm Password</label>
+                        </div>
                     </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" value="" name="iAgree" id="iAgree" required>
-                      <label class="form-check-label text-secondary" for="iAgree">
-                        I agree to the <a href="#!" class="link-primary text-decoration-none">terms and conditions</a>
-                      </label>
+                    <div class="col-12">
+                        <div class="d-grid">
+                            <button class="btn btn-custom btn-lg" type="submit">Sign up</button>
+                        </div>
                     </div>
-                  </div>
-                  <div class="col-12">
-                    <div class="d-grid">
-                      <button class="btn btn-custom btn-lg" type="submit">Sign up</button>
-                    </div>
-                  </div>
                 </div>
-              </form>
+            </form>
               <div class="row mt-4">
                 <div class="col-12">
                   <hr class="mt-5 mb-4">
@@ -117,5 +119,19 @@
       </div>
     </div>
   </section>
+  <script>
+    document.getElementById('registrationForm').addEventListener('submit',function(event){
+      var username = document.getElementById('username').value;
+      var usernameError = document.getElementById('usernameError');
+      var regex = /^[a-zA-Z0-9_]{4,20}$/;
+      if (!regex.test(username)) {
+        usernameError.style.display = 'block';
+        event.preventDefault(); // Prevent form submission
+      } else {
+        usernameError.style.display = 'none';
+      }
+    });
+   
+  </script>
 </body>
 </html>

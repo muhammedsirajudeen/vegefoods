@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.models import User
 
@@ -25,5 +25,18 @@ def user_managment(request):
     return render(request,'admin/users.html',{'users':users})
 
 
+def block_unblock_user(request, user_id):
+    if not request.user.is_staff:
+        return redirect('home')  # Redirect if the user is not an admin
 
+    user = get_object_or_404(User, id=user_id)
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        if action == 'block':
+            user.is_active = False
+        elif action == 'unblock':
+            user.is_active = True
+        user.save()
+
+    return redirect('user_management')  # Redi
 

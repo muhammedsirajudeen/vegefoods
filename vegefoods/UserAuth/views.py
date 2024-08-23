@@ -8,8 +8,9 @@ from django.contrib.sessions.models import Session
 from django.core.mail import send_mail
 from django.conf import settings
 from . models import  OTP
-
+from django.contrib.auth.backends import ModelBackend
 import random
+from django.contrib.auth import login
 # Create your views here.
 
 
@@ -30,9 +31,20 @@ def user_registration(request):
         email = request.POST.get('email')
         pass1 = request.POST.get('password1')
         pass2 = request.POST.get('password2')
+        
+
+        errors = {}
+        if User.objects.filter(username =  uname).exists():
+            errors['username_error'] = 'Username already exists'
+
+        if User.objects.filter(email =  email).exists():
+            errors['email_error'] = 'Email is already exists'
 
         if pass1 != pass2:
-            return render(request, 'user/signup.html', {'error': 'Passwords do not match'})
+            errors['password_error'] = 'Passwords do not match'
+
+        if errors:
+            return render(request,'user/signup.html', {'errors': errors})
         user = User.objects.create_user(username=uname, first_name=first_name, last_name=last_name, email=email, password=pass1)
         user.save()
 
@@ -53,31 +65,34 @@ def send_otp_via_email(email, otp_code):
 
 
 
-from django.contrib.auth import login
-from django.contrib.auth.backends import ModelBackend
+
+
 
 def verify_otp(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         if request.method == 'POST':
-            entered_otp = ''.join([request.POST.get(f'otp{i+1}') for i in range(6)])
+            entered_otp = request.POST.get('otp')  # Get the full OTP from the form input
             otp_record = OTP.objects.get(user=user)
 
+        
             if otp_record.otp_code == entered_otp and otp_record.is_valid():
                 user.is_active = True
                 user.save()
-                otp_record.delete()
+                otp_record.delete() 
 
-                # Log the user in with the correct backend
                 login(request, user, backend='django.contrib.auth.backends.ModelBackend')
 
                 return redirect('home')
             else:
+               
                 return render(request, 'user/otp.html', {'error': 'Invalid OTP or OTP expired'})
 
     except User.DoesNotExist:
+        # Redirect to home if the user does not exist
         return redirect('home')
 
+    # Render the OTP input form
     return render(request, 'user/otp.html')
 @never_cache 
 def user_login(request):
@@ -90,7 +105,7 @@ def user_login(request):
             login(request,user)
             return redirect('home')
         else:
-            print("wrong")
+            return render(request,'user/login.html',{'error':'Username or Password is Wrong'})
     return render(request,'user/login.html')
 
 

@@ -19,6 +19,7 @@ def category_management(request):
         'form': form
     })
 
+
 def edit_category(request, category_id):
     category = get_object_or_404(Category, id=category_id)
     if request.method == 'POST':
@@ -29,3 +30,9 @@ def edit_category(request, category_id):
     else:
         form = CategoryForm(instance=category)
     return render(request, 'admin/edit_category.html', {'form': form})
+
+def toggle_category_listing(request, category_id):
+    category=  get_object_or_404(Category,id = category_id)
+    category.is_listed = not category.is_listed
+    category.save()
+    return redirect('category_management')

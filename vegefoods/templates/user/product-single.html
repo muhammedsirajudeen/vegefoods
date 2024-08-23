@@ -65,13 +65,27 @@
                 </div>
                 <div class="d-flex">
                     <div class="pricing">
-                        {% if product.offer > 0 %}
-                        <p class="price"><span class="mr-2 price-dc" style="text-decoration: line-through; color: #b3b3b3; font-size: 22px;">₹120.00</span><span class="price-sale">₹{{product.price}}</span></p>
+                        {% if product.category.is_listed and product.is_listed %}
+                            {% if product.offer > 0 %}
+                                <p class="price">
+                                    <span class="mr-2 price-dc" style="text-decoration: line-through; color: #b3b3b3; font-size: 22px;">₹120.00</span>
+                                    <span class="price-sale">₹{{ product.price }}</span>
+                                </p>
+                            {% else %}
+                                <p class="price">
+                                    <span class="mr-2 price-dc"></span>
+                                    <span class="price-sale">₹{{ product.price }}</span>
+                                </p>
+                            {% endif %}
                         {% else %}
-                        <p class="price"><span class="mr-2 price-dc"></span><span class="price-sale">₹{{product.price}}</span></p>
+                            <p class="price">
+                                <span class="price-unavailable" style="font-size: 22px; color: red; font-weight: bold; background-color: #f2dede; padding: 5px 10px; border-radius: 5px; display: inline-block;">Unavailable</span>
+                            </p>
                         {% endif %}
                     </div>
+                    
                 </div>
+                {% if product.category.is_listed and product.is_listed%}
                 <p>{{product.description}}</p>
                 <div class="row mt-4">
                     <div class="col-md-6">
@@ -101,8 +115,43 @@
                     </div>
                 </div>
                 <p><a href="cart.html" class="btn btn-black py-3 px-5">Add to Cart</a></p>
-            </div>
+                {% else %}
+                <p>{{product.description}}</p>
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="form-group d-flex">
+                        </div>
+                    </div>
+                    <div class="w-100"></div>
+                    
+                    <!-- Quantity Selector -->
+                    <div class="input-group col-md-6 d-flex mb-3"  style="pointer-events: none; cursor: not-allowed;">
+                        <span class="input-group-btn mr-2">
+                            <button type="button" class="quantity-left-minus btn disabled" data-type="minus" data-field="">
+                                <i class="ion-ios-remove"></i>
+                            </button>
+                        </span>
+                        <input type="text" id="quantity" name="quantity" class="form-control input-number" value="0.5 {{ product.category.category_unit }}" min="0.5" max="10" >
+                        <span class="input-group-btn ml-2">
+                            <button type="button" class="quantity-right-plus btn disabled" data-type="plus" data-field="">
+                                <i class="ion-ios-add"></i>
+                            </button>
+                        </span>
+                    </div>
+
+                    <div class="w-100"></div>
+                    <div class="col-md-12">
+                        <!-- <p style="color: #000;">{{ product.available_stock }}{{ product.category.category_unit }} available</p> -->
+                    </div>
+                </div>
+                <p>
+                    <a href="#" class="btn btn-black py-3 px-5 disabled" style="pointer-events: none; cursor: not-allowed;">
+                        Add to Cart
+                    </a>
+                </p>
+                        {% endif %}
         </div>
     </div>
 </section>
 {% endblock %}
+                       

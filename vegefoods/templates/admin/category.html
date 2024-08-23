@@ -88,8 +88,11 @@
                               <button class="btn btn-primary" data-toggle="modal" data-target="#editCategoryModal{{ category.id }}">
                                 Edit
                               </button>
-                              <button class="btn btn-outline-danger btn-sm" style="padding: 10px 20px;">Delete</button>
-                            </td>
+                              {% if category.is_listed %}
+                              <a href="{% url 'toggle_category_listing' category.id %}" class="btn btn-outline-danger btn-sm" style="padding: 10px 20px;">Unlist</a>
+                          {% else %}
+                              <a href="{% url 'toggle_category_listing' category.id %}" class="btn btn-outline-success btn-sm" style="padding: 10px 20px;">ReList</a>
+                          {% endif %}                            </td>
                           </tr>
 
                           <!-- Edit Category Modal -->

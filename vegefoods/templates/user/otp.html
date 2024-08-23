@@ -28,13 +28,27 @@
         .btn {
             height: 50px;
         }
+        .otp-input {
+    width: 100%; /* Makes the input take up the full width */
+    padding: 10px; /* Adds padding inside the input */
+    font-size: 1.5rem; /* Increases the font size for better readability */
+    border: 1px solid #ccc; /* Adds a subtle border */
+    border-radius: 5px; /* Rounds the corners of the input */
+    box-shadow: none; /* Removes any default shadow */
+    outline: none; /* Removes the default outline */
+}
+
+.otp-input:focus {
+    border-color: #28a745; /* Changes border color on focus */
+    box-shadow: 0 0 5px rgba(40, 167, 69, 0.5); /* Adds a green glow on focus */
+}
+
     </style>
 </head>
 <body>
     <div class="container p-5">
-        <div class="row">
-            <div class="col-md-3"></div>
-            <div class="col-md-5 mt-5">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-5 mt-5">
                 <div class="bg-white p-5 rounded-3 shadow-sm border">
                     <div>
                         <p class="text-center text-success" style="font-size: 5.5rem;"><i class="fa-solid fa-envelope-circle-check"></i></p>
@@ -43,44 +57,37 @@
                         
                         <!-- Django Form Start -->
                         <form method="POST">
-                            {% csrf_token %}
-                            <div class="row pt-4 pb-2">
-                                <div class="col-2">
-                                    <input class="otp-letter-input" type="text" name="otp1" maxlength="1">
-                                </div>
-                                <div class="col-2">
-                                    <input class="otp-letter-input" type="text" name="otp2" maxlength="1">
-                                </div>
-                                <div class="col-2">
-                                    <input class="otp-letter-input" type="text" name="otp3" maxlength="1">
-                                </div>
-                                <div class="col-2">
-                                    <input class="otp-letter-input" type="text" name="otp4" maxlength="1">
-                                </div>
-                                <div class="col-2">
-                                    <input class="otp-letter-input" type="text" name="otp5" maxlength="1">
-                                </div>
-                                <div class="col-2">
-                                    <input class="otp-letter-input" type="text" name="otp6" maxlength="1">
-                                </div>
-                            </div>
-                            <p class="text-muted text-center">Didn't get the code? <a id="resend-link" href="#" class="text-success disabled">Resend in <span id="timer">30</span> seconds</a></p>
-                            <div class="row pt-5">
-                                <div class="col-6">
-                                    <button class="btn btn-outline-secondary w-100" type="button">Cancel</button>
-                                </div>
-                                <div class="col-6">
-                                    <button class="btn btn-success w-100" type="submit">Verify</button>
-                                </div>
-                            </div>
-                        </form>
-                        <!-- Django Form End -->
+    {% csrf_token %}
+    <div class="row pt-4 pb-2">
+        <form method="POST">
+            {% csrf_token %}
+            <div class="pt-4 pb-2">
+                <input class="otp-input text-center" type="text" name="otp" maxlength="6" placeholder="Enter 6-digit code">
+            </div>
+            {% if error %}
+            <div class="alert alert-danger text-center">
+                {{error}}
+            </div>
+            {% endif %}
+            <p class="text-muted text-center">Didn't get the code? <a id="resend-link" href="#" class="text-success disabled">Resend in <span id="timer">30</span> seconds</a></p>
+            <div class="row pt-5">
+                <div class="col-6">
+                    <button class="btn btn-outline-secondary w-100" type="button">Cancel</button>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-success w-100" type="submit">Verify</button>
+                </div>
+            </div>
+        </form>
+        
 
+                        <!-- Django Form End -->
                     </div>
                 </div>
             </div>
         </div>
     </div>
+    
 
     <!-- JavaScript for Countdown Timer -->
     <script>

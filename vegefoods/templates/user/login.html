@@ -6,6 +6,8 @@
   <title>Document</title>
   <link rel="stylesheet" href="https://unpkg.com/bootstrap@5.3.3/dist/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://unpkg.com/bs-brain@2.0.4/components/logins/login-6/assets/css/login-6.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
 </head>
 <body>
   <!-- Login 6 - Bootstrap Brain Component -->
@@ -39,16 +41,8 @@
                   </div>
                 </div>
                 <div class="col-12">
-                  <div class="form-check">
-                    <input class="form-check-input" type="checkbox" value="" name="remember_me" id="remember_me">
-                    <label class="form-check-label text-secondary" for="remember_me">
-                      Keep me logged in
-                    </label>
-                  </div>
-                </div>
-                <div class="col-12">
                   <div class="d-grid">
-                    <button class="btn bsb-btn-2xl " type="submit"style="background-color: #82ae46;color:#ff">Log in now</button>
+                    <button class="btn bsb-btn-2xl" type="submit" style="background-color: #82ae46;color:#fff">Log in now</button>
                   </div>
                 </div>
               </div>
@@ -82,5 +76,15 @@
     </div>
   </div>
 </section>
+{% if error  %}
+<script>
+   Swal.fire({
+      icon: 'error',
+      title: 'Oops...',
+      text: '{{ error }}',
+    });
+
+</script>
+{% endif %}
 </body>
 </html>

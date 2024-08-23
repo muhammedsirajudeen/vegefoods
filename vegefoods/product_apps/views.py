@@ -47,6 +47,14 @@ def edit_product(request, product_id):
         'editing_product': product,  # Ensure you use 'editing_product' to match the template variable
     })
   
+def toggle_product_listing(request, product_id):
+    print(f"Toggling listing for product_id: {product_id}")
+    product = get_object_or_404(Product, id=product_id)
+    product.is_listed = not product.is_listed
+    product.save()
+    return redirect('product_management')
+
+
 
 
 def user_products(request):
