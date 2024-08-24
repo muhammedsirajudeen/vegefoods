@@ -9,7 +9,7 @@ class ProductForm(forms.ModelForm):
             'description',
             'category',
             'available_stock',
-            'price',          # Add price field
+            'price',
             'offer',
             'image_1',
             'image_2',
@@ -28,6 +28,25 @@ class ProductForm(forms.ModelForm):
             'image_3': forms.ClearableFileInput(attrs={'class': 'form-control-file', 'required': False}),
      
         }
+
+    def clean_product_name(self):
+        product_name =  self.cleaned_data.get('product_name')
+        if Product.objects.filter(product_name__iexact=product_name).exists():
+            raise forms.ValidationError('A product with this name already exists.')
+        return product_name.title()
+    
+    def clean_description(self):
+        description = self.cleaned_data.get('description', '')
+        if len(description) < 250:
+            raise forms.ValidationError('Description must be at least 250 characters long.')
+        return description
+        
+    def clean_price(self):
+        price = self.cleaned_data.get('price')
+        if price is not None and price <= 0:
+            raise forms.ValidationError('Price must be a positive number.')
+        return price
+
 
     def clean(self):
         cleaned_data = super().clean()

@@ -35,59 +35,65 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Edit Product</h4>
-                                    <form id="editProductForm" method="POST" enctype="multipart/form-data" action="{% url 'edit_product' editing_product.id %}">
+                                    <form id="editProductForm" method="POST" enctype="multipart/form-data" action="{% url 'edit_product' product.id %}">
                                         {% csrf_token %}
                                         <div class="form-group">
-                                            {{ form.product_name.label_tag }}
-                                            {{ form.product_name }}
+                                            <label for="product_name">Product Name</label>
+                                            <input type="text" id="product_name" name="product_name" value="{{ product.product_name }}" class="form-control">
                                         </div>
                                         <div class="form-group">
-                                            {{ form.description.label_tag }}
-                                            {{ form.description }}
+                                            <label for="description">Description</label>
+                                            <textarea id="description" name="description" class="form-control">{{ product.description }}</textarea>
                                         </div>
                                         <div class="form-group">
-                                            {{ form.category.label_tag }}
-                                            {{ form.category }}
+                                            <label for="category">Category</label>
+                                            <select id="category" name="category" class="form-control">
+                                                <!-- Assuming you have categories in a variable called categories -->
+                                                {% for cat in categories %}
+                                                    <option value="{{ cat.id }}" {% if cat.id == product.category.id %}selected{% endif %}>{{ cat.name }}</option>
+                                                {% endfor %}
+                                            </select>
                                         </div>
                                         <div class="form-group">
-                                            {{ form.available_stock.label_tag }}
-                                            {{ form.available_stock }}
+                                            <label for="available_stock">Available Stock</label>
+                                            <input type="number" id="available_stock" name="available_stock" value="{{ product.available_stock }}" class="form-control">
                                         </div>
                                         <div class="form-group">
-                                            {{ form.price.label_tag }}
-                                            {{ form.price }}
+                                            <label for="price">Price</label>
+                                            <input type="number" id="price" name="price" step="0.01" value="{{ product.price }}" class="form-control">
                                         </div>
                                         <div class="form-group">
-                                            {{ form.offer.label_tag }}
-                                            {{ form.offer }}
+                                            <label for="offer">Offer</label>
+                                            <input type="text" id="offer" name="offer" value="{{ product.offer }}" class="form-control">
                                         </div>
                                         <div class="form-group">
-                                            {{ form.image_1.label_tag }}
-                                            <input type="file" id="image1Input" name="image_1" accept="image/*">
+                                            <label for="image_1">Image 1</label>
+                                            <input type="file" id="image_1" name="image_1" accept="image/*">
                                             <div class="image-preview">
                                                 <img id="image1Preview" src="{{ product.image_1.url }}" style="max-width: 100%; margin-top: 10px; display: block;">
                                                 <button type="button" id="cropImage1Button" class="btn btn-primary" style="display: none;">Crop</button>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            {{ form.image_2.label_tag }}
-                                            <input type="file" id="image2Input" name="image_2" accept="image/*">
+                                            <label for="image_2">Image 2</label>
+                                            <input type="file" id="image_2" name="image_2" accept="image/*">
                                             <div class="image-preview">
                                                 <img id="image2Preview" src="{{ product.image_2.url }}" style="max-width: 100%; margin-top: 10px; display: block;">
                                                 <button type="button" id="cropImage2Button" class="btn btn-primary" style="display: none;">Crop</button>
                                             </div>
                                         </div>
                                         <div class="form-group">
-                                            {{ form.image_3.label_tag }}
-                                            <input type="file" id="image3Input" name="image_3" accept="image/*">
+                                            <label for="image_3">Image 3</label>
+                                            <input type="file" id="image_3" name="image_3" accept="image/*">
                                             <div class="image-preview">
                                                 <img id="image3Preview" src="{{ product.image_3.url }}" style="max-width: 100%; margin-top: 10px; display: block;">
                                                 <button type="button" id="cropImage3Button" class="btn btn-primary" style="display: none;">Crop</button>
                                             </div>
                                         </div>
                                         <button type="submit" class="btn btn-success">Update Product</button>
-                                        <a href="{% url 'product_management'  %}" class="btn btn-secondary">Back to Product List</a>
+                                        <a href="{% url 'product_management' %}" class="btn btn-secondary">Back to Product List</a>
                                     </form>
+                                    
                                 </div>
                             </div>
                         </div>

@@ -19,11 +19,14 @@ def redirect_to_home(request):
 
 @never_cache
 def user_home(request):
+    
     username = request.user.username
     return render(request, 'user/index.html',{'username': username})
 
 
 def user_registration(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == 'POST':
         uname = request.POST.get('username')
         first_name = request.POST.get('firstName')
@@ -69,6 +72,8 @@ def send_otp_via_email(email, otp_code):
 
 
 def verify_otp(request, user_id):
+    if request.user.is_authenticated:
+        return redirect('home')
     try:
         user = User.objects.get(id=user_id)
         if request.method == 'POST':
@@ -96,6 +101,8 @@ def verify_otp(request, user_id):
     return render(request, 'user/otp.html')
 @never_cache 
 def user_login(request):
+    if request.user.is_authenticated:
+        return redirect('home')
     if request.method == 'POST':
         username = request.POST.get('username')
         pass1 = request.POST.get('pass')
@@ -118,6 +125,8 @@ def user_logout(request):
 
 class CustomPasswordResetView(PasswordResetView):
     def form_valid(self, form):
+        if self.request.user.is_authenticated:
+            return redirect('user_home') 
         email = form.cleaned_data.get('email')
         if not User.objects.filter(email=email).exists():
             return render(self.request, 'user/password_reset_form.html', {

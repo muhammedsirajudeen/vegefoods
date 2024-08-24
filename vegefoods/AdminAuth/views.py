@@ -1,5 +1,5 @@
 from django.shortcuts import render,redirect,get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
 
 def admin_login(request):
@@ -16,18 +16,21 @@ def admin_login(request):
     return render(request, 'admin/admin_login.html')
 
 def panel(request):
-    if not request.user.is_authenticated or not request.user.is_staff:
-        return redirect('admin/admin_login')  
+    if not request.user.is_authenticated or not request.user.is_superuser: 
+        return redirect('admin_login')  # Use the correct URL name
     return render(request, 'admin/dashboard.html')  
 
-def user_managment(request):
+ 
+def user_managment(request):  # Fixed name here
+    if not request.user.is_authenticated or not request.user.is_superuser:  
+        return redirect('admin_login') 
     users = User.objects.filter(is_superuser =  False).order_by('username')
     return render(request,'admin/users.html',{'users':users})
 
 
 def block_unblock_user(request, user_id):
-    if not request.user.is_staff:
-        return redirect('home')  # Redirect if the user is not an admin
+    if not request.user.is_authenticated or not request.user.is_superuser:  # Added authentication check
+        return redirect('admin_login') # Redirect if the user is not an admin
 
     user = get_object_or_404(User, id=user_id)
     if request.method == 'POST':
@@ -38,5 +41,9 @@ def block_unblock_user(request, user_id):
             user.is_active = True
         user.save()
 
-    return redirect('user_management')  # Redi
+    return redirect('user_management')  
+
+def admin_logout(request):
+    logout(request)
+    return redirect('admin_login')
 

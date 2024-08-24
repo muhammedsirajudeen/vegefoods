@@ -20,6 +20,10 @@
     <link rel="stylesheet" href="{% static 'admin/css/style.css' %}">
     <!-- End layout styles -->
     <link rel="shortcut icon" href="{% static 'admin/images/favicon.png' %}" />
+    <!-- Include SweetAlert CSS and JavaScript -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.all.min.js"></script>
+
   </head>
   <body>
     <div class="container-scroller">
@@ -85,9 +89,8 @@
                             <td>{{ category.category_unit }}</td>
                             <td>{{ category.updated_at }}</td>
                             <td>
-                              <button class="btn btn-primary" data-toggle="modal" data-target="#editCategoryModal{{ category.id }}">
-                                Edit
-                              </button>
+                              
+                              <a href="{% url 'edit_category' category.id %}" class="btn btn-primary">Edit</a>
                               {% if category.is_listed %}
                               <a href="{% url 'toggle_category_listing' category.id %}" class="btn btn-outline-danger btn-sm" style="padding: 10px 20px;">Unlist</a>
                           {% else %}
@@ -95,27 +98,7 @@
                           {% endif %}                            </td>
                           </tr>
 
-                          <!-- Edit Category Modal -->
-                          <div class="modal fade" id="editCategoryModal{{ category.id }}" tabindex="-1" aria-labelledby="editCategoryModalLabel{{ category.id }}" aria-hidden="true">
-                            <div class="modal-dialog">
-                              <div class="modal-content">
-                                <div class="modal-header">
-                                  <h5 class="modal-title" id="editCategoryModalLabel{{ category.id }}">Edit Category</h5>
-                                  <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                  </button>
-                                </div>
-                                <div class="modal-body">
-                                  <form id="editCategoryForm{{ category.id }}" method="POST" action="{% url 'edit_category' category.id %}">
-                                    {% csrf_token %}
-                                    {{ form.as_p }}
-                                    <button type="submit" class="btn btn-success">Update Category</button>
-                                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                                  </form>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
+                          
                           {% endfor %}
                         </tbody>
                       </table>
@@ -177,5 +160,26 @@
     <!-- Custom js for this page -->
     <script src="{% static 'admin/js/dashboard.js' %}"></script>
     <!-- End custom js for this page -->
+
+    {% if errors %}
+    <script>
+        Swal.fire({
+            title: 'Error!',
+            html: `{% for field, error_list in errors.items %}
+                    {{ error_list|join:', ' }}<br>
+                   {% endfor %}`,
+            icon: 'error',
+            confirmButtonText: 'OK'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Assuming the form ID for create is 'createCategoryForm' and edit forms have ID like 'editCategoryForm{{ category.id }}'
+                clearFormAndHideModal('createCategoryModal', 'createCategoryForm');
+            }
+        });
+    </script>
+{% endif %}
+
+
+
   </body>
 </html>
