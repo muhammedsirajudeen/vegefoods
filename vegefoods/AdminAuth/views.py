@@ -3,6 +3,8 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
 
 def admin_login(request):
+    if request.user.is_authenticated and request.user.is_staff:
+        return redirect('panel') 
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')

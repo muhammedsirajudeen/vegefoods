@@ -39,45 +39,46 @@ def edit_category(request, category_id):
 
     if request.method == 'POST':
         category_name = request.POST.get('category_name')
-        category_image = request.FILES.get('category_image')
         category_offer = request.POST.get('category_offer')
         category_unit = request.POST.get('category_unit')
 
-        errors = {}
+        errors = []
 
        
         if Category.objects.exclude(id=category_id).filter(category_name__iexact=category_name).exists():
-            errors['category_name'] = 'Category name already exists'
+            errors.append('Category name already exists')
+
         if not category_name.isalpha():
-            errors['category_name'] = 'Category name must contain characters only'
+            errors.append('Category name must contain characters only')
 
 
-        if not category_unit.isalpha():
-            errors['category_unit'] = 'Category unit must contain characters only'
+
 
         if errors:
             return render(request, 'admin/edit_category.html', {
                 'category': category,
-                'errors': errors
+                'errors': errors,
+                'categories': Category.objects.all(),
+                'units': Category.objects.values_list('category_unit', flat=True).distinct()
             })
 
         
         category_name = category_name.title()  
-        category_unit = category_unit.lower() 
+     
 
        
         category.category_name = category_name
         category.category_offer = category_offer
         category.category_unit = category_unit
-        if category_image:
-            category.category_image = category_image
         category.save()
 
         messages.success(request, 'Category updated successfully.')
         return redirect('category_management')
 
     return render(request, 'admin/edit_category.html', {
-        'category': category
+        'category': category,
+        'categories':Category.objects.all(),
+        'units': Category.objects.values_list('category_unit', flat=True).distinct()
     })
 
 def toggle_category_listing(request, category_id):

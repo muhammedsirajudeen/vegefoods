@@ -27,6 +27,7 @@
       color: #6f8b3f;
     }
   </style>
+  <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet">
 </head>
 <body>
   <!-- Registration Form -->
@@ -42,28 +43,39 @@
               <form action="" method="POST" id="registrationForm">
                 {% csrf_token %}
                 <div class="row g-3">
-                  <div class="col-12">
-                      <div class="form-floating">
-                          <input type="text" class="form-control {% if errors.username_error %}is-invalid{% endif %}" name="username" id="username" placeholder="Username" required>
-                          <label for="username" class="form-label">Username</label>
-                          {% if errors.username_error %}
-                              <div class="invalid-feedback">{{ errors.username_error }}</div>
-                          {% endif %}
-                          <div class="invalid-feedback" id="usernameError" style="display: none;">Username must be 4-20 characters long and can only contain letters, numbers, and underscores.</div>
-                      </div>
-                  </div>
+                    <div class="col-12">
+                        <div class="form-floating">
+                            <input type="text" class="form-control {% if errors.username_error %}is-invalid{% endif %}" name="username" id="username" placeholder="Username" required>
+                            <label for="username" class="form-label">Username</label>
+                            {% if errors.username_error %}
+                                <div class="invalid-feedback">{{ errors.username_error }}</div>
+                            {% endif %}
+                            <div class="invalid-feedback" id="usernameError" style="display: none;">Username must be 4-20 characters long and can only contain letters, numbers, and underscores.</div>
+                        </div>
+                    </div>
+            
                     <div class="col-12 col-md-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control" name="firstName" id="firstName" placeholder="First Name" required>
+                            <input type="text" class="form-control {% if errors.first_name_error %}is-invalid{% endif %}" name="firstName" id="firstName" placeholder="First Name" required>
                             <label for="firstName" class="form-label">First Name</label>
+                            {% if errors.first_name_error %}
+                                <div class="invalid-feedback">{{ errors.first_name_error }}</div>
+                            {% endif %}
+                            <div class="invalid-feedback" id="firstNameError" style="display: none;">First name should not contain numbers.</div>
                         </div>
                     </div>
+            
                     <div class="col-12 col-md-6">
                         <div class="form-floating">
-                            <input type="text" class="form-control" name="lastName" id="lastName" placeholder="Last Name" required>
+                            <input type="text" class="form-control {% if errors.last_name_error %}is-invalid{% endif %}" name="lastName" id="lastName" placeholder="Last Name" required>
                             <label for="lastName" class="form-label">Last Name</label>
+                            {% if errors.last_name_error %}
+                                <div class="invalid-feedback">{{ errors.last_name_error }}</div>
+                            {% endif %}
+                            <div class="invalid-feedback" id="lastNameError" style="display: none;">Last name should not contain numbers.</div>
                         </div>
                     </div>
+            
                     <div class="col-12">
                         <div class="form-floating">
                             <input type="email" class="form-control {% if errors.email_error %}is-invalid{% endif %}" name="email" id="email" placeholder="name@example.com" required>
@@ -73,6 +85,7 @@
                             {% endif %}
                         </div>
                     </div>
+            
                     <div class="col-12">
                         <div class="form-floating">
                             <input type="password" class="form-control {% if errors.password_error %}is-invalid{% endif %}" name="password1" id="password" placeholder="Password" required>
@@ -82,12 +95,26 @@
                             {% endif %}
                         </div>
                     </div>
+            
                     <div class="col-12">
                         <div class="form-floating">
-                            <input type="password" class="form-control" name="password2" id="confirmPassword" placeholder="Confirm Password" required>
+                            <input type="password" class="form-control {% if errors.confirm_password_error %}is-invalid{% endif %}" name="password2" id="confirmPassword" placeholder="Confirm Password" required>
                             <label for="confirmPassword" class="form-label">Confirm Password</label>
+                            {% if errors.confirm_password_error %}
+                                <div class="invalid-feedback">{{ errors.confirm_password_error }}</div>
+                            {% endif %}
                         </div>
                     </div>
+            
+                    <div class="col-12">
+                        <ul class="text-muted mt-2">
+                            <li>At least 8 characters long</li>
+                            <li>At least one uppercase letter and lower letter</li>
+                            <li>Password must contain at least one number</li>
+                            <li>At least one special character(!@#$%^&*(),.?":{}|<>)</li>
+                        </ul>
+                    </div>
+            
                     <div class="col-12">
                         <div class="d-grid">
                             <button class="btn btn-custom btn-lg" type="submit">Sign up</button>
@@ -95,6 +122,7 @@
                     </div>
                 </div>
             </form>
+            
               <div class="row mt-4">
                 <div class="col-12">
                   <hr class="mt-5 mb-4">
@@ -119,19 +147,20 @@
       </div>
     </div>
   </section>
+  <!-- <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script> -->
+  <!-- {% if errors %}
   <script>
-    document.getElementById('registrationForm').addEventListener('submit',function(event){
-      var username = document.getElementById('username').value;
-      var usernameError = document.getElementById('usernameError');
-      var regex = /^[a-zA-Z0-9_]{4,20}$/;
-      if (!regex.test(username)) {
-        usernameError.style.display = 'block';
-        event.preventDefault(); // Prevent form submission
-      } else {
-        usernameError.style.display = 'none';
-      }
-    });
-   
-  </script>
+    // Display SweetAlert popups for each error
+    
+        {% for field, error in errors.items %}
+            Swal.fire({
+                icon: 'error',
+                title: 'Oops...',
+                text: '{{ error }}'
+            });
+        {% endfor %}
+    
+</script>
+{% endif %} -->
 </body>
 </html>

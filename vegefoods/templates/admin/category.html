@@ -59,13 +59,7 @@
                       <table class="table">
                         <thead>
                           <tr>
-                            <th>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </th>
+                           
                             <th>Id</th>
                             <th>Category Name</th>
                             <th>Created At</th>
@@ -77,19 +71,11 @@
                           <!-- Loop through categories -->
                           {% for category in categories %}
                           <tr>
-                            <td>
-                              <div class="form-check form-check-muted m-0">
-                                <label class="form-check-label">
-                                  <input type="checkbox" class="form-check-input">
-                                </label>
-                              </div>
-                            </td>
                             <td>{{ category.id }}</td>
                             <td>{{ category.category_name }}</td>
                             <td>{{ category.category_unit }}</td>
                             <td>{{ category.updated_at }}</td>
                             <td>
-                              
                               <a href="{% url 'edit_category' category.id %}" class="btn btn-primary">Edit</a>
                               {% if category.is_listed %}
                               <a href="{% url 'toggle_category_listing' category.id %}" class="btn btn-outline-danger btn-sm" style="padding: 10px 20px;">Unlist</a>

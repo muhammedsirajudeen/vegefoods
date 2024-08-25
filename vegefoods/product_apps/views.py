@@ -5,22 +5,24 @@ from django.contrib.auth.models import User
 from . forms import ProductForm
 from django.db.models import  F
 from django.contrib import messages
+import re
 # Create your views here.
 
 
 
 def product_list(request):
     if not request.user.is_authenticated or not request.user.is_superuser:
-        return redirect('admin_login')  #
+        return redirect('admin_login')  
     if request.method == 'POST':
         form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
-            messages.success(request, 'Product added successfully.')
+            messages.success(request, 'Product added successfully!')
             return redirect('product_management')  # Adjust as necessary
         else:
-            # Collect form errors for display
-            errors = form.errors
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field.capitalize()}: {error}")
     else:
         form = ProductForm()
         errors = None
@@ -41,7 +43,7 @@ def edit_product(request, product_id):
     if not request.user.is_authenticated or not request.user.is_superuser:
         return redirect('admin_login') 
     product = get_object_or_404(Product, id=product_id)
-
+    errors = []
     if request.method == 'POST':
         # Extract data from the form
         product_name = request.POST.get('product_name')
@@ -51,12 +53,35 @@ def edit_product(request, product_id):
         price = request.POST.get('price')
         offer = request.POST.get('offer')
         
+
         # Handle file uploads
         image_1 = request.FILES.get('image_1')
         image_2 = request.FILES.get('image_2')
         image_3 = request.FILES.get('image_3')
 
-        # Update the product object
+        
+
+        if len(description) < 100:
+            errors.append('Description must be less than 100 characters.')
+
+        if float(price) < 0:
+            errors.append('Price cannot be negative.')
+
+        if re.search(r'\s', product_name):
+            errors.append('Product name must not contain spaces.')
+
+        for image in [image_1, image_2, image_3]:
+            if image:
+                if not image.name.lower().endswith(('.jpg', '.jpeg', '.png')):
+                    errors.append(f'Image {image.name} is not a valid format. Only jpg, jpeg, and png are allowed.')
+
+        if errors:
+            return render(request, 'admin/edit_product.html', {
+                'product': product,
+                'categories': Category.objects.all(),
+                'errors': errors,
+            })
+        
         product.product_name = product_name
         product.description = description
         product.category_id = category_id
@@ -83,9 +108,8 @@ def edit_product(request, product_id):
         return render(request, 'admin/edit_product.html', {
             'product': product,
             'categories': Category.objects.all(),  # Assuming you have a Category model
+            
         })
-
-
   
 def toggle_product_listing(request, product_id):
     if not request.user.is_authenticated or not request.user.is_superuser:

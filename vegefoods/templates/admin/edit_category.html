@@ -38,27 +38,40 @@
                 <div class="card">
                   <div class="card-body">
                     <h4 class="card-title">Edit Category</h4>
+                    {% if errors %}
+                    <div class="alert alert-danger">
+                        <ul>
+                            {% for error in errors %}
+                                <li>{{ error }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
                     <form method="POST" action="{% url 'edit_category' category.id %}" enctype="multipart/form-data">
                       {% csrf_token %}
                       <div class="form-group">
                           <label for="categoryName">Category Name</label>
                           <input type="text" class="form-control" id="categoryName" name="category_name" value="{{ category.category_name }}" required>
                       </div>
-                      <div class="form-group">
+                      <!-- <div class="form-group">
                           <label for="categoryImage">Category Image</label>
                           <input type="file" class="form-control" id="categoryImage" name="category_image">
                           {% if category.category_image %}
                           <img src="{{ category.category_image.url }}" alt="Category Image" style="max-width: 200px; margin-top: 10px;">
                           {% endif %}
-                      </div>
+                      </div> -->
                       <div class="form-group">
                           <label for="categoryOffer">Category Offer</label>
                           <input type="text" class="form-control" id="categoryOffer" name="category_offer" value="{{ category.category_offer }}">
                       </div>
                       <div class="form-group">
-                          <label for="categoryUnit">Category Unit</label>
-                          <input type="text" class="form-control" id="categoryUnit" name="category_unit" value="{{ category.category_unit }}">
-                      </div>
+                        <label for="categoryUnit">Category Unit</label>
+                        <select id="categoryUnit" name="category_unit" class="form-control">
+                            {% for unit in units %}
+                                <option value="{{ unit }}" {% if unit == category.category_unit %}selected{% endif %}>{{ unit }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
                       <button type="submit" class="btn btn-success">Update Category</button>
                       <a href="{% url 'category_management' %}" class="btn btn-secondary">Cancel</a>
                   </form>
@@ -96,17 +109,6 @@
     <script src="{% static 'admin/js/dashboard.js' %}"></script>
     <!-- End custom js for this page -->
 
-    {% if errors %}
-    <script>
-        Swal.fire({
-            title: 'Error!',
-            html: `{% for field, error_list in errors.items %}
-                    {{ error_list|join:', ' }}<br>
-                   {% endfor %}`,
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    </script>
-    {% endif %}
+   
   </body>
-</
+</html>

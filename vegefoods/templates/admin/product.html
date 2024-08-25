@@ -169,8 +169,21 @@
                     <div class="modal-body">
                         <!-- Form for creating a product -->
                         <!-- Form for creating a product -->
+                        {% if messages %}
+                        <div class="container mt-3">
+                            {% for message in messages %}
+                                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                    {{ message }}
+                                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                        <span aria-hidden="true">&times;</span>
+                                    </button>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
 <form id="createProductForm" method="POST" enctype="multipart/form-data">
   {% csrf_token %}
+  {{ form.non_field_errors }}
   <div class="form-group">
       {{ form.product_name.label_tag }}
       {{ form.product_name }}
@@ -247,7 +260,7 @@
   </div>
 </div>
 
-        
+
           <!-- End Create New Category Modal -->
 
         </div>
@@ -339,17 +352,10 @@ document.addEventListener('DOMContentLoaded', function () {
 
     cropImageButton.addEventListener('click', handleCropImage);
 });
+alert({{"errors"}})
 
 </script>
-{% if errors %}
-    <script>
-        Swal.fire({
-                    icon: 'error',
-                    title: 'Oops...',
-                    text: 'There were some errors with your form submission. Please check the fields and try again.',
-                });
-    </script>
-{% endif %}
+
 
   </body>
 </html>

@@ -11,6 +11,7 @@ from . models import  OTP
 from django.contrib.auth.backends import ModelBackend
 import random
 from django.contrib.auth import login
+import re
 # Create your views here.
 
 
@@ -37,8 +38,23 @@ def user_registration(request):
         
 
         errors = {}
+        # Username validation: no digits or spaces allowed
+        if any(char.isdigit() or char.isspace() for char in uname):
+            errors['username_error'] = 'Username should not contain numbers or spaces'
+
+          # First name validation: no digits or spaces allowed
+        if any(char.isdigit() or char.isspace() for char in first_name):
+            errors['first_name_error'] = 'First name should not contain numbers or spaces'
+
+        
+        if any(char.isdigit() or char.isspace() for char in last_name):
+            errors['last_name_error'] = 'Last name should not contain numbers or spaces'
+
+
+        
         if User.objects.filter(username =  uname).exists():
             errors['username_error'] = 'Username already exists'
+
 
         if User.objects.filter(email =  email).exists():
             errors['email_error'] = 'Email is already exists'
@@ -46,6 +62,16 @@ def user_registration(request):
         if pass1 != pass2:
             errors['password_error'] = 'Passwords do not match'
 
+        if len(pass1) < 8:
+            errors['password_error'] = 'Password must be at least 8 characters long'
+        if not re.search(r'[A-Z]', pass1):
+            errors['password_error'] = 'Password must contain at least one uppercase letter'
+        if not re.search(r'[a-z]', pass1):
+            errors['password_error'] = 'Password must contain at least one lowercase letter'
+        if not re.search(r'[0-9]', pass1):
+            errors['password_error'] = 'Password must contain at least one number'
+        if not re.search(r'[!@#$%^&*(),.?":{}|<>]', pass1):
+            errors['password_error'] = 'Password must contain at least one special character'
         if errors:
             return render(request,'user/signup.html', {'errors': errors})
         user = User.objects.create_user(username=uname, first_name=first_name, last_name=last_name, email=email, password=pass1)

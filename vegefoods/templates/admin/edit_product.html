@@ -35,6 +35,15 @@
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Edit Product</h4>
+                                    {% if errors %}
+                                    <div class="alert alert-danger">
+                                        <ul>
+                                            {% for error in errors %}
+                                                <li>{{ error }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                    </div>
+                                {% endif %}
                                     <form id="editProductForm" method="POST" enctype="multipart/form-data" action="{% url 'edit_product' product.id %}">
                                         {% csrf_token %}
                                         <div class="form-group">
@@ -50,7 +59,7 @@
                                             <select id="category" name="category" class="form-control">
                                                 <!-- Assuming you have categories in a variable called categories -->
                                                 {% for cat in categories %}
-                                                    <option value="{{ cat.id }}" {% if cat.id == product.category.id %}selected{% endif %}>{{ cat.name }}</option>
+                                                    <option value="{{ cat.id }}" {% if cat.id == product.category.id %}selected{% endif %}>{{ cat.category_name }}</option>
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -201,6 +210,9 @@
     
         cropImageButton.addEventListener('click', handleCropImage);
     });
+
+    
+
     </script>
 </body>
 </html>
