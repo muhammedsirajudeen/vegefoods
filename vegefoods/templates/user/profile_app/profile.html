@@ -1,0 +1,62 @@
+
+
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}Home - Vegefoods{% endblock %}
+
+
+{% block content %} 
+
+  <div class="hero-wrap hero-bread" style="background-image: url({% static "images/bg_1.jpg" %});"
+    <div class="container">
+      <div class="row no-gutters slider-text align-items-center justify-content-center">
+        <div class="col-md-12 ftco-animate text-center">
+          <p class="breadcrumbs"><span class="mr-2"><a href="index.html">Home</a></span> <span>My Profile</span></p>
+          <h1 class="mb-0 bread">My Profile</h1>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="ftco-section contact-section bg-light">
+    <div class="container">
+      <div class="row mb-5">
+        <div class="col-md-4">
+          <div class="bg-white p-4">
+            <h3>Account Management</h3>
+            <ul class="list-unstyled">
+              <li><a href="#profile-management" class="btn btn-link">Profile Management</a></li>
+              <li><a href="address.html" class="btn btn-link">Address Management</a></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-8">
+          <div class="bg-white p-4 profile-container">
+            <h3>Profile Details</h3>
+            <form method="POST" action="/update_profile">
+              <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" class="form-control" id="username" name="username" value="current_username" required>
+              </div>
+              <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" class="form-control" id="email" name="email" value="current_email" readonly>
+              </div>
+              <div class="form-group">
+                <label for="password">New Password</label>
+                <input type="password" class="form-control" id="password" name="password">
+              </div>
+              <button type="submit" class="btn btn-primary py-3 px-5">Update Profile</button>
+            </form>
+            <hr>
+            <h3>Delete Account</h3>
+            <form method="POST" action="/delete_account">
+              <button type="submit" class="btn btn-danger">Delete Account</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {% endblock %}

@@ -54,6 +54,7 @@ INSTALLED_APPS = [
     'category_app',
     'product_apps',
     'crispy_forms',
+    'profile_app'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {

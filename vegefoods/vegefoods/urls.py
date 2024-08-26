@@ -25,6 +25,7 @@ urlpatterns = [
     path('user/', include('UserAuth.urls')),
     path('categories/', include('category_app.urls')),
     path('products/', include('product_apps.urls')),
+    path('profile/',include('profile_app.urls')),
     
     path('', views.redirect_to_home),  # Redirect root URL to /user/home
 ]

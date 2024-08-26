@@ -3,7 +3,30 @@
 {% block title %}Shop - Vegefoods{% endblock %}
 
 {% block content %} 
+<div class="breadcrumb-wrap" style="padding: 15px 0; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
+    <div class="container">
+        <p class="breadcrumbs" style="font-size: 18px; font-weight: 500; color: #333; margin: 0; display: flex; align-items: center;">
+            <span class="mr-2" style="margin-right: 10px; color: #82ae46; display: flex; align-items: center;">
+                <a href="{% url 'home' %}" style="color: #82ae46; text-decoration: none; display: flex; align-items: center;">
+                    <i class="fas fa-home" style="font-size: 16px; margin-right: 5px;"></i> Home
+                </a>
+            </span>
+            <span class="mr-2" style="margin-right: 10px; color: #82ae46; display: flex; align-items: center;">
+                <i class="fas fa-chevron-right" style="font-size: 16px; margin-right: 5px;"></i>
+            </span>
+            <span style="color: #82ae46;">
+                <a href="{% url 'user_products' %}" style="color: #82ae46; text-decoration: none;">Shop</a>
+                <i class="fas fa-chevron-right" style="font-size: 16px; margin-right: 5px;"></i>
+            </span>
+            <span style="color: #555;">
+                <a href="" style="color: #555; text-decoration: none;">{{ product.product_name }}</a>
+            </span>
+        </p>
+    </div>
+</div>
+
 <section class="ftco-section">
+    
     <div class="container">
         <div class="row">
             <!-- Product Image Carousel -->
@@ -68,8 +91,9 @@
                         {% if product.category.is_listed and product.is_listed %}
                             {% if product.offer > 0 %}
                                 <p class="price">
-                                    <span class="mr-2 price-dc" style="text-decoration: line-through; color: #b3b3b3; font-size: 22px;">₹120.00</span>
-                                    <span class="price-sale">₹{{ product.price }}</span>
+                                    <span class="mr-2 price-dc" style="text-decoration: line-through; color: #b3b3b3; font-size: 22px;">₹{{ product.price }}</span>
+                                    <span class="price-sale">₹{{ product.discount_price|floatformat:2  }}</span>
+                                    <span class="offer-badge" style="color: green; font-size: 18px; margin-left: 10px; font-weight: bold;">{{ product.offer }}% OFF</span>
                                 </p>
                             {% else %}
                                 <p class="price">
@@ -111,10 +135,13 @@
 
                     <div class="w-100"></div>
                     <div class="col-md-12">
+                    {% if product.available_stock <= 0 %}
+                        <p style="color: red;">Out of Stock</p>
+                    {% else %}
                         <p style="color: #000;">{{ product.available_stock }}{{ product.category.category_unit }} available</p>
-                    </div>
+                    {% endif %}                    </div>
                 </div>
-                <p><a href="cart.html" class="btn btn-black py-3 px-5">Add to Cart</a></p>
+                <p><a href="cart.html" class="btn btn-black py-3 px-5 ">Add to Cart</a></p>
                 {% else %}
                 <p>{{product.description}}</p>
                 <div class="row mt-4">

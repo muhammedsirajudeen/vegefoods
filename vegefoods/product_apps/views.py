@@ -38,14 +38,14 @@ def product_list(request):
     })
 
 
-# View to edit an existing product
+
 def edit_product(request, product_id):
     if not request.user.is_authenticated or not request.user.is_superuser:
         return redirect('admin_login') 
     product = get_object_or_404(Product, id=product_id)
     errors = []
     if request.method == 'POST':
-        # Extract data from the form
+ 
         product_name = request.POST.get('product_name')
         description = request.POST.get('description')
         category_id = request.POST.get('category')
@@ -54,7 +54,6 @@ def edit_product(request, product_id):
         offer = request.POST.get('offer')
         
 
-        # Handle file uploads
         image_1 = request.FILES.get('image_1')
         image_2 = request.FILES.get('image_2')
         image_3 = request.FILES.get('image_3')
@@ -122,16 +121,15 @@ def toggle_product_listing(request, product_id):
 
 
 
-
 def user_products(request):
     username = request.user.username
     category = request.GET.get('category', 'All') 
-    sort_by = request.GET.get('sort_by','default') 
+    sort_by = request.GET.get('sort_by', 'default') 
 
     if category == 'All':
         product_list = Product.objects.all()
     else:
-        product_list = Product.objects.filter(category__category_name=category) 
+        product_list = Product.objects.filter(category__category_name=category)
 
     if sort_by == 'price_low_high':
         product_list = product_list.order_by('price')
@@ -139,15 +137,15 @@ def user_products(request):
         product_list = product_list.order_by('-price')
     elif sort_by == 'discount':
         product_list = product_list.order_by('-offer')
-    else:
-        pass
+    
+    
+
     return render(request, 'user/shop.html', {
         'products': product_list,
         'username': username,
         'selected_category': category,
-        'selected_sort':sort_by,
+        'selected_sort': sort_by,
     })
-
 
 def product_details(request,product_id):
     product = get_object_or_404(Product,id=product_id)

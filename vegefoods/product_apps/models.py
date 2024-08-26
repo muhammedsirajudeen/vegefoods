@@ -23,3 +23,7 @@ class Product(models.Model):
 
     def __str__(self):
         return self.product_name
+
+    def discount_price(self):
+        discount =  self.price - (self.offer * self.price/100)
+        return discount

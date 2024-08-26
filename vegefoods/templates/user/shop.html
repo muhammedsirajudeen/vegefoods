@@ -15,16 +15,30 @@
         </div>
       </div>
     </div>
-
+	<div class="breadcrumb-wrap" style="padding: 15px 0; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
+		<div class="container">
+			<p class="breadcrumbs" style="font-size: 18px; font-weight: 500; color: #333; margin: 0; display: flex; align-items: center;">
+				<span class="mr-2" style="margin-right: 10px; color: #82ae46; display: flex; align-items: center;">
+					<a href="{% url 'home' %}" style="color: #82ae46; text-decoration: none; display: flex; align-items: center;">
+						<i class="fas fa-home" style="font-size: 16px; margin-right: 5px;"></i> Home
+					</a>
+				</span>
+				<span class="mr-2" style="margin-right: 10px; color: #82ae46; display: flex; align-items: center;">
+					<i class="fas fa-chevron-right" style="font-size: 16px; margin-right: 5px;"></i>
+				</span>
+				<span style="color: #555;">Shop</span>
+			</p>
+		</div>
+	</div>
     <section class="ftco-section">
     	<div class="container">
     		<div class="row justify-content-center">
 				<div class="col-md-10 mb-5 text-center">
 					<ul class="product-category">
 						<li><a href="?category=All" class="{% if selected_category == 'All' %}active{% endif %}">All</a></li>
-						<li><a href="?category=Vegetables" class="{% if selected_category == 'Vegetables' %}active{% endif %}">Vegetables</a></li>
+						<li><a href="?category=Vegitables" class="{% if selected_category == 'Vegitables' %}active{% endif %}">Vegitables</a></li>
 						<li><a href="?category=Fruits" class="{% if selected_category == 'Fruits' %}active{% endif %}">Fruits</a></li>
-						<li><a href="?category=Juice" class="{% if selected_category == 'Juice' %}active{% endif %}">Juice</a></li>
+						<li><a href="?category=Juices" class="{% if selected_category == 'Juices' %}active{% endif %}">Juices</a></li>
 						<li><a href="?category=Dried" class="{% if selected_category == 'Dried' %}active{% endif %}">Dried</a></li>
 						<li> <div class="dropdown">
 							<button class="btn  dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="color: #82ae46;border: none;">

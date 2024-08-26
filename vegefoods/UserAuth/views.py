@@ -1,4 +1,4 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth.views import PasswordResetView
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate,login,logout
@@ -10,8 +10,10 @@ from django.conf import settings
 from . models import  OTP
 from django.contrib.auth.backends import ModelBackend
 import random
+from django.http import JsonResponse
 from django.contrib.auth import login
 import re
+from product_apps.models import Product
 # Create your views here.
 
 
@@ -20,9 +22,9 @@ def redirect_to_home(request):
 
 @never_cache
 def user_home(request):
-    
+ 
     username = request.user.username
-    return render(request, 'user/index.html',{'username': username})
+    return render(request, 'user/index.html',{'username': username })
 
 
 def user_registration(request):
@@ -38,11 +40,11 @@ def user_registration(request):
         
 
         errors = {}
-        # Username validation: no digits or spaces allowed
+    
         if any(char.isdigit() or char.isspace() for char in uname):
             errors['username_error'] = 'Username should not contain numbers or spaces'
 
-          # First name validation: no digits or spaces allowed
+        
         if any(char.isdigit() or char.isspace() for char in first_name):
             errors['first_name_error'] = 'First name should not contain numbers or spaces'
 
@@ -77,11 +79,11 @@ def user_registration(request):
         user = User.objects.create_user(username=uname, first_name=first_name, last_name=last_name, email=email, password=pass1)
         user.save()
 
-        # Create and send OTP
+
         otp = OTP(user=user)
         otp.save()
         send_otp_via_email(email, otp.otp_code)
-        return redirect('verify_otp',user_id=user.id)  # Corrected redirect usage
+        return redirect('verify_otp',user_id=user.id)
 
     return render(request, 'user/signup.html')
 
@@ -93,6 +95,18 @@ def send_otp_via_email(email, otp_code):
     send_mail(subject, message, email_from, recipient_list)
 
 
+def resend_otp(request):
+    if request.method == 'POST':
+        user_id = request.POST.get('user_id')
+        user = get_object_or_404(User, id=user_id)
+        otp_record = OTP.objects.get(user=user)
+
+        # Generate new OTP
+        new_otp = otp_record.generate_new_otp()
+        send_otp_via_email(user.email, new_otp)
+
+        return JsonResponse({'success': True, 'message': 'OTP resent successfully'})
+    return JsonResponse({'success': False, 'message': 'Invalid request'})
 
 
 
@@ -103,7 +117,7 @@ def verify_otp(request, user_id):
     try:
         user = User.objects.get(id=user_id)
         if request.method == 'POST':
-            entered_otp = request.POST.get('otp')  # Get the full OTP from the form input
+            entered_otp = request.POST.get('otp') 
             otp_record = OTP.objects.get(user=user)
 
         
@@ -120,10 +134,9 @@ def verify_otp(request, user_id):
                 return render(request, 'user/otp.html', {'error': 'Invalid OTP or OTP expired'})
 
     except User.DoesNotExist:
-        # Redirect to home if the user does not exist
         return redirect('home')
 
-    # Render the OTP input form
+
     return render(request, 'user/otp.html')
 @never_cache 
 def user_login(request):

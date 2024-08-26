@@ -12,7 +12,7 @@ class CategoryForm(forms.ModelForm):
         widgets = {
             'category_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Enter category name'}),
             'category_offer': forms.NumberInput(attrs={'class': 'form-control', 'placeholder': 'Enter category offer', 'step': '0.01'}),
-            'category_unit': forms.Select(attrs={'class': 'form-control'}),  # Use Select widget for dropdown
+            'category_unit': forms.Select(attrs={'class': 'form-control'}),  
         }
 
     def clean_category_name(self):
