@@ -29,6 +29,8 @@
     <link rel="stylesheet" href="{% static 'css/icomoon.css' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
   </head>
 <body class="goto-here">
     <!-- Navbar -->
@@ -81,27 +83,30 @@
 					<li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
 					<li class="nav-item cta cta-colored"><a href="cart.html" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
 					
-					<!-- User Dropdown -->
-					<li class="nav-item dropdown">
-                        {% if user.is_authenticated %}
-						<a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            {{username}}                           
-                            {% else %}
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            My Account
-                            {% endif %}
-                        </a>
-						<div class="dropdown-menu" aria-labelledby="userDropdown">
-							<a class="dropdown-item" href="profile.html">My Profile</a>
-							<a class="dropdown-item" href="orderlist.html">Order List</a>
-							<a class="dropdown-item" href="wallet.html">My wallet</a>
-							{% if user.is_authenticated %}
-                                 <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
-                            {% else %}
-                            <a class="dropdown-item" href="{% url 'login' %}">Login</a>
-                            {% endif %}
-						</div>
-					</li>
+				
+<!-- User Dropdown -->
+<li class="nav-item dropdown">
+    <a class="nav-link dropdown-toggle" href="#" id="userDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        {% if user.is_authenticated %}
+            {{ user.username }}
+        {% else %}
+            Profile
+        {% endif %}
+    </a>
+    <div class="dropdown-menu" aria-labelledby="userDropdown">
+        {% if user.is_authenticated %}
+            <a class="dropdown-item" href="{% url 'profile_view' %}">My Profile</a>
+            <a class="dropdown-item" href="#">Order List</a>
+            <a class="dropdown-item" href="#">My Wallet</a>
+            <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
+        {% else %}
+            <a class="dropdown-item" href="{% url 'login' %}">Login</a>
+            <a class="dropdown-item" href="{% url 'signup' %}">Sign Up</a>
+        {% endif %}
+    </div>
+</li>
+
+
 				</ul>
 			</div>
 		</div>
@@ -280,8 +285,7 @@
         });
     </script>
     
-    
-        
+
        
 </body>
 </html>

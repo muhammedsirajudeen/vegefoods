@@ -1,13 +1,10 @@
-
-
 {% extends 'user/base.html' %}
 {% load static %}
 {% block title %}Home - Vegefoods{% endblock %}
 
-
 {% block content %} 
 
-  <div class="hero-wrap hero-bread" style="background-image: url({% static "images/bg_1.jpg" %});"
+  <div class="hero-wrap hero-bread" style="background-image: url({% static "images/bg_1.jpg" %});">
     <div class="container">
       <div class="row no-gutters slider-text align-items-center justify-content-center">
         <div class="col-md-12 ftco-animate text-center">
@@ -26,37 +23,25 @@
             <h3>Account Management</h3>
             <ul class="list-unstyled">
               <li><a href="#profile-management" class="btn btn-link">Profile Management</a></li>
-              <li><a href="address.html" class="btn btn-link">Address Management</a></li>
+              <li><a href="{% url 'user_address' %}" class="btn btn-link">Address Management</a></li>
             </ul>
           </div>
         </div>
         <div class="col-md-8">
           <div class="bg-white p-4 profile-container">
             <h3>Profile Details</h3>
-            <form method="POST" action="/update_profile">
-              <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" class="form-control" id="username" name="username" value="current_username" required>
-              </div>
-              <div class="form-group">
-                <label for="email">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="current_email" readonly>
-              </div>
-              <div class="form-group">
-                <label for="password">New Password</label>
-                <input type="password" class="form-control" id="password" name="password">
-              </div>
-              <button type="submit" class="btn btn-primary py-3 px-5">Update Profile</button>
-            </form>
+            <p><strong>Username:</strong> {{ user.username }}</p>
+            <p><strong>First Name:</strong> {{ user.first_name }}</p>
+            <p><strong>Last Name:</strong> {{ user.last_name }}</p>
+            <p><strong>Email:</strong> {{ user.email }}</p>
             <hr>
-            <h3>Delete Account</h3>
-            <form method="POST" action="/delete_account">
-              <button type="submit" class="btn btn-danger">Delete Account</button>
-            </form>
+            <div class="d-flex justify-content-between align-items-center">
+              <a href="{% url 'update_profile' user.id %}" class="btn btn-primary py-3 px-5">Update Account</a>
+            </div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
-  {% endblock %}
+{% endblock %}

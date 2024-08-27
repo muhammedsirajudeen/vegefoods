@@ -28,7 +28,8 @@
               <li><a href="profile.html" class="btn btn-link">Profile Management</a></li>
             </ul>
             <!-- Add New Address Button -->
-            <button type="button" class="btn btn-primary py-3 px-5" data-toggle="modal" data-target="#addAddressModal">Add New Address</button>
+   
+            <a href="{% url 'add_address' %}" class="btn btn-primary py-3 px-5">Add New Address</a>
           </div>
         </div>
         <div class="col-md-8">
@@ -37,25 +38,19 @@
 
             <!-- Displaying Addresses -->
             <div class="address-list">
+              {% for address in address %}
               <div class="address-item">
-                <h4>Home</h4>
-                <p>123 Main St, Anytown, USA</p>
-                <a href="#" class="btn btn-secondary">Edit</a>
+                <h4>{{address.address_type}}</h4>
+                <p>{{address.address}}</p>
+                <a href="{% url 'edit_address' address.id %}" class="btn btn-secondary">Edit</a>
                 <form method="POST" action="/delete_address" style="display:inline;">
                   <input type="hidden" name="address_id" value="1">
                   <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               </div>
+              {% endfor %}
               <hr>
-              <div class="address-item">
-                <h4>Office</h4>
-                <p>456 Office Rd, Business City, USA</p>
-                <a href="#" class="btn btn-secondary">Edit</a>
-                <form method="POST" action="/delete_address" style="display:inline;">
-                  <input type="hidden" name="address_id" value="2">
-                  <button type="submit" class="btn btn-danger">Delete</button>
-                </form>
-              </div>
+
             </div>
 
             <hr>
@@ -65,30 +60,5 @@
     </div>
   </section>
 
-  <!-- Modal -->
-  <div class="modal fade" id="addAddressModal" tabindex="-1" role="dialog" aria-labelledby="addAddressModalLabel" aria-hidden="true">
-    <div class="modal-dialog" role="document">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="addAddressModalLabel">Add New Address</h5>
-          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <span aria-hidden="true">&times;</span>
-          </button>
-        </div>
-        <div class="modal-body">
-          <form method="POST" action="/add_address">
-            <div class="form-group">
-              <label for="addressType">Address Type</label>
-              <input type="text" class="form-control" id="addressType" name="addressType" placeholder="Home/Office" required>
-            </div>
-            <div class="form-group">
-              <label for="address">Address</label>
-              <input type="text" class="form-control" id="address" name="address" placeholder="123 Main St, Anytown, USA" required>
-            </div>
-            <button type="submit" class="btn btn-primary py-3 px-5">Add Address</button>
-          </form>
-        </div>
-      </div>
-    </div>
-  </div>
+
   {% endblock %}
