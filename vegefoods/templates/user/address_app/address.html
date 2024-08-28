@@ -37,8 +37,9 @@
             <h3>Manage Addresses</h3>
 
             <!-- Displaying Addresses -->
+            {% for address in address %}
             <div class="address-list">
-              {% for address in address %}
+              
               <div class="address-item">
                 <h4>{{address.address_type}}</h4>
                 <p>{{address.address}}</p>
@@ -48,10 +49,11 @@
                   <button type="submit" class="btn btn-danger">Delete</button>
                 </form>
               </div>
-              {% endfor %}
+              
               <hr>
 
             </div>
+            {% endfor %}
 
             <hr>
           </div>

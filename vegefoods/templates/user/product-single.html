@@ -141,8 +141,10 @@
                         <p style="color: #000;">{{ product.available_stock }}{{ product.category.category_unit }} available</p>
                     {% endif %}                    </div>
                 </div>
-                <p><a href="cart.html" class="btn btn-black py-3 px-5 ">Add to Cart</a></p>
-                {% else %}
+                <!-- <p><a href="cart.html" class="btn btn-black py-3 px-5 ">Add to Cart</a></p> -->
+
+                <p><button id="add-to-cart" class="btn btn-black py-3 px-5">Add to Cart</button></p>                                                                                                                                                                                                                                                                                                                                                            
+                 {% else %}
                 <p>{{product.description}}</p>
                 <div class="row mt-4">
                     <div class="col-md-6">
@@ -180,5 +182,38 @@
         </div>
     </div>
 </section>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        document.getElementById('add-to-cart').addEventListener('click', function() {
+            const quantity = document.getElementById('quantity').value;
+            const productId = "{{ product.id }}";
+            
+            fetch('{% url "add_to_cart" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: new URLSearchParams({
+                    'product_id': productId,
+                    'quantity': quantity
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    alert(data.message);
+                } else {
+                    alert(data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+</script>
+
 {% endblock %}
-                       
+
+           
