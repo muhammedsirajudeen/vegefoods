@@ -75,7 +75,7 @@
 							<a class="dropdown-item" href="{%  url 'user_products' %}">Shop</a>
 							<a class="dropdown-item" href="wishlist.html">Wishlist</a>
 							<a class="dropdown-item" href="product-single.html">Single Product</a>
-							<a class="dropdown-item" href="cart.html">Cart</a>
+							<a class="dropdown-item" href="{% url 'cart' %}">Cart</a>
 							<a class="dropdown-item" href="checkout.html">Checkout</a>
 						</div>
 					</li>
@@ -208,84 +208,6 @@
     <script src="{% static 'js/jquery.animateNumber.min.js' %}"></script>
     <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
     <script src="{% static 'js/scrollax.min.js' %}"></script>
-    <script src="{% static 'js/main.js' %}"></script>
-    <script>
-        $(document).ready(function(){
-        
-            // Function to update the quantity field with the correct unit
-            function updateQuantity(quantity, unit) {
-                if (unit === "packet") {
-                    $('#quantity').val("Pack of " + quantity);
-                } else {
-                    $('#quantity').val(quantity + " " + unit);
-                }
-            }
-        
-            // Function to parse the numeric part of the input value
-            function parseQuantity() {
-                var value = $('#quantity').val();
-                var unit = "{{ product.category.category_unit }}"; // Replace with your actual unit variable
-                if (unit === "packet") {
-                    var match = value.match(/Pack of (\d+)/);
-                    return match ? parseInt(match[1]) : 1; // Default to 1 if not found
-                } else {
-                    var quantity = value.split(" ")[0];
-                    return parseFloat(quantity); // Parse float to handle decimal numbers
-                }
-            }
-        
-            // Event handler for increment button
-            $('.quantity-right-plus').click(function(e){
-                e.preventDefault();
-                var quantity = parseQuantity();
-                var unit = "{{ product.category.category_unit }}"; // Replace with your actual unit variable
-        
-                // Adjust the increment based on the unit
-                if (unit === "kg") {
-                    if (quantity < 10) {
-                        quantity = Math.min(quantity + 0.5, 10); // Ensure quantity does not exceed 10
-                    }
-                } else if (unit === "g") {
-                    if (quantity < 500) {
-                        quantity = Math.min(quantity + 50, 500); // Ensure quantity does not exceed 500g
-                    }
-                } else if (unit === "packet") {
-                    if (quantity === 1) {
-                        quantity = 2; 
-                    } else if (quantity === 2) {
-                        quantity = 1; 
-                    }
-                }
-        
-                updateQuantity(quantity, unit);
-            });
-        
-            // Event handler for decrement button
-            $('.quantity-left-minus').click(function(e){
-                e.preventDefault();
-                var quantity = parseQuantity();
-                var unit = "{{ product.category.category_unit }}"; // Replace with your actual unit variable
-        
-                // Adjust the decrement based on the unit
-                if (unit === "kg" && quantity > 0.5) {
-                    quantity = Math.max(quantity - 0.5, 0.5); // Ensure quantity does not go below 0.5kg
-                } else if (unit === "g" && quantity > 100) {
-                    quantity = Math.max(quantity - 50, 100); // Ensure quantity does not go below 100g
-                } else if (unit === "packet") {
-                    if (quantity === 2) {
-                        quantity = 1; // Change to pack of 1 if currently pack of 2
-                    } else if (quantity === 1) {
-                        quantity = 2; // Change to pack of 2 if currently pack of 1
-                    }
-                }
-        
-                updateQuantity(quantity, unit);
-            });
-        
-        });
-    </script>
-    
-
-       
+    <script src="{% static 'js/main.js' %}"></script>   
 </body>
 </html>
