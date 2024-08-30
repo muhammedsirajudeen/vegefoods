@@ -30,6 +30,41 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        /* Add this to your CSS file */
+        /* Ensuring all elements in the tbody are vertically aligned to the middle */
+.table tbody tr {
+    vertical-align: middle;
+}
+
+/* Styling for the image div to ensure consistent size and alignment */
+.image-prod .img {
+    width: 100px;
+    height: 100px;
+    background-size: cover;
+    background-position: center;
+    display: block;
+}
+
+/* Custom dropdown styling to match template color pattern */
+.custom-dropdown {
+    border: 1px solid #dcdcdc; /* Match your template's border color */
+    background-color: #f8f9fa; /* Match your template's background color */
+    color: #333; /* Match your template's text color */
+    padding: 5px;
+    font-size: 16px;
+    width: 100%;
+}
+
+.custom-dropdown:focus {
+    outline: none;
+    border-color: #007bff; /* Match your template's focus border color */
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Focus shadow */
+}
+
+/* Add any other necessary styles to match the rest of your template */
+
+    </style>
 
   </head>
 <body class="goto-here">

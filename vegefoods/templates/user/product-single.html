@@ -212,32 +212,4 @@
     });
     </script>
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Increase quantity
-    document.querySelectorAll('.quantity-right-plus').forEach(function(button) {
-        button.addEventListener('click', function() {
-            var input = this.closest('.input-group').querySelector('.quantity');
-            var max = parseFloat(input.getAttribute('max'));
-            var step = parseFloat(input.getAttribute('step'));
-            var current = parseFloat(input.value);
-            if (current + step <= max) {
-                input.value = (current + step).toFixed(1);
-            }
-        });
-    });
-
-    // Decrease quantity
-    document.querySelectorAll('.quantity-left-minus').forEach(function(button) {
-        button.addEventListener('click', function() {
-            var input = this.closest('.input-group').querySelector('.quantity');
-            var min = parseFloat(input.getAttribute('min'));
-            var step = parseFloat(input.getAttribute('step'));
-            var current = parseFloat(input.value);
-            if (current - step >= min) {
-                input.value = (current - step).toFixed(1);
-            }
-        });
-    });
-});
-
 {% endblock %}

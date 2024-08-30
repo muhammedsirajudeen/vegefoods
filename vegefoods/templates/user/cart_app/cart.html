@@ -21,32 +21,32 @@
                         </thead>
                         <tbody>
                             {% for item in items %}
-                            <tr class="text-center">
+                            <tr class="text-center align-middle">
                                 <td class="product-remove">
-                                    <a href="">
+                                    <a href="#" data-product-id="{{ item.product.id }}">
                                         <span class="ion-ios-close"></span>
                                     </a>
                                 </td>
+                                
                                 <td class="image-prod">
                                     <div class="img" style="background-image:url({{ item.product.image_1.url }});"></div>
                                 </td>
                                 <td class="product-name">
                                     <h3>{{ item.product.product_name }}</h3>
-                                    <p>{{ item.product.description }}</p>
                                 </td>
                                 <td class="price">₹{{ item.product.price }}</td>
                                 <td class="quantity">
                                     <div class="input-group mb-3">
-                                        <button type="button" class="quantity-left-minus btn" data-type="minus" data-field="">
-                                            <i class="ion-ios-remove"></i>
-                                        </button>
-                                        <input type="text" name="quantity" class="quantity form-control input-number" value="{{ item.quantity }}" min="1" max="100">
-                                        <button type="button" class="quantity-right-plus btn" data-type="plus" data-field="">
-                                            <i class="ion-ios-add"></i>
-                                        </button>
+                                        <select name="quantity" class="form-select quantity custom-dropdown" 
+                                                data-unit="{{ item.product.category.category_unit }}" 
+                                                data-product-id="{{ item.product.id }}"
+                                                data-current-quantity="{{ item.quantity }}">
+                                            <!-- Options will be inserted by JavaScript -->
+                                        </select>
                                     </div>
                                 </td>
-                                <td class="total">₹222</td>
+                                
+                                <td class="total">₹{{ item.quantity|floatformat:2|add:item.product.price|floatformat:2 }}</td>
                             </tr>
                             {% empty %}
                             <tr class="text-center">
@@ -55,6 +55,7 @@
                             {% endfor %}
                         </tbody>
                     </table>
+                    
                 </div>
             </div>
         </div>
@@ -77,16 +78,17 @@
                     <h3>Cart Totals</h3>
                     <p class="d-flex">
                         <span>Subtotal</span>
-						<span>₹{{ subtotal }}</span>                    </p>
+                        <span>₹{{ subtotal }}</span>                    
+                    </p>
                     <p class="d-flex">
                         <span>Delivery</span>
-						<span>₹{{ delivery_charge }}</span>
+                        <span>₹{{ delivery_charge }}</span>
                     </p>
                     
                     <hr>
                     <p class="d-flex total-price">
                         <span>Total</span>
-						<span>₹{{ total }}</span>
+                        <span>₹{{ total }}</span>
                     </p>
                 </div>
                 <p><a href="" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
@@ -94,4 +96,97 @@
         </div>
     </div>
 </section>
+<script>
+   document.addEventListener('DOMContentLoaded', function () {
+    
+    const quantitySelectors = document.querySelectorAll('select.quantity');
+
+    quantitySelectors.forEach(selector => {
+        const unit = selector.getAttribute('data-unit');
+        const productId = selector.getAttribute('data-product-id');
+
+        let options = [];
+        if (unit === 'kg') {
+            for (let i = 1; i <= 5; i += 0.5) {
+                options.push(i.toFixed(1) + ' kg');
+            }
+        } else if (unit === 'packet') {
+            options = ['1 packet', '6 packets'];
+        }
+
+        options.forEach(option => {
+            const optionElement = document.createElement('option');
+            optionElement.value = option;
+            optionElement.textContent = option;
+            selector.appendChild(optionElement);
+        });
+
+        selector.addEventListener('change', function () {
+            const quantityText = this.value;
+            const quantity = parseFloat(quantityText);
+            const totalCell = this.closest('tr').querySelector('.total');
+            const price = parseFloat(this.closest('tr').querySelector('.price').textContent.replace('₹', ''));
+
+            const total = price * quantity;
+            totalCell.textContent = '₹' + total.toFixed(2);
+
+            // Send the updated quantity to the backend
+            fetch('/cart/update-quantity/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}',
+    },
+    body: JSON.stringify({
+        product_id: productId,
+        quantity: quantity
+    })
+})
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert('Failed to update quantity.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+
+        selector.dispatchEvent(new Event('change'));
+    });
+
+    const removeButtons = document.querySelectorAll('.product-remove a');
+    removeButtons.forEach(button => {
+        button.addEventListener('click', function (event) {
+            event.preventDefault();
+
+            const productId = this.getAttribute('data-product-id');
+
+            fetch(`/cart/remove-from-cart/${productId}/`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({ product_id: productId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    this.closest('tr').remove();
+                } else {
+                    alert('Failed to remove item from cart.');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    });
+});
+
+
+    </script>
+    
 {% endblock %}
