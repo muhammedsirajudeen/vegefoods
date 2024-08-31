@@ -27,7 +27,6 @@
                                         <span class="ion-ios-close"></span>
                                     </a>
                                 </td>
-                                
                                 <td class="image-prod">
                                     <div class="img" style="background-image:url({{ item.product.image_1.url }});"></div>
                                 </td>
@@ -45,7 +44,6 @@
                                         </select>
                                     </div>
                                 </td>
-                                
                                 <td class="total">₹{{ item.quantity|floatformat:2|add:item.product.price|floatformat:2 }}</td>
                             </tr>
                             {% empty %}
@@ -55,50 +53,51 @@
                             {% endfor %}
                         </tbody>
                     </table>
-                    
                 </div>
             </div>
         </div>
         <div class="row justify-content-end">
-            <div class="col-lg-4 mt-5 cart-wrap ftco-animate">
-                <div class="cart-total mb-3">
-                    <h3>Coupon Code</h3>
-                    <p>Enter your coupon code if you have one</p>
-                    <form action="#" class="info">
-                        <div class="form-group">
-                            <label for="">Coupon code</label>
-                            <input type="text" class="form-control text-left px-3" placeholder="">
-                        </div>
-                    </form>
-                </div>
-                <p><a href="#" class="btn btn-primary py-3 px-4">Apply Coupon</a></p>
-            </div>
+           
             <div class="col-lg-4 mt-5 cart-wrap ftco-animate">
                 <div class="cart-total mb-3">
                     <h3>Cart Totals</h3>
                     <p class="d-flex">
                         <span>Subtotal</span>
-                        <span>₹{{ subtotal }}</span>                    
+                        <span id="subtotal">₹{{ subtotal }}</span>
                     </p>
                     <p class="d-flex">
                         <span>Delivery</span>
-                        <span>₹{{ delivery_charge }}</span>
+                        <span id="delivery">₹{{ delivery_charge }}</span>
                     </p>
-                    
                     <hr>
                     <p class="d-flex total-price">
                         <span>Total</span>
-                        <span>₹{{ total }}</span>
+                        <span id="total">₹{{ total }}</span>
                     </p>
                 </div>
-                <p><a href="" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
+                <p><a href="#" class="btn btn-primary py-3 px-4">Proceed to Checkout</a></p>
             </div>
         </div>
     </div>
 </section>
+
 <script>
-   document.addEventListener('DOMContentLoaded', function () {
-    
+document.addEventListener('DOMContentLoaded', function () {
+
+    function calculateCartTotals() {
+        let subtotal = 0;
+        document.querySelectorAll('.total').forEach(function(totalCell) {
+            subtotal += parseFloat(totalCell.textContent.replace('₹', ''));
+        });
+
+        const deliveryCharge = subtotal >= 500 ? 0 : 40;
+        const total = subtotal + deliveryCharge;
+
+        document.getElementById('subtotal').textContent = '₹' + subtotal.toFixed(2);
+        document.getElementById('delivery').textContent = '₹' + deliveryCharge.toFixed(2);
+        document.getElementById('total').textContent = '₹' + total.toFixed(2);
+    }
+
     const quantitySelectors = document.querySelectorAll('select.quantity');
 
     quantitySelectors.forEach(selector => {
@@ -130,18 +129,20 @@
             const total = price * quantity;
             totalCell.textContent = '₹' + total.toFixed(2);
 
+            calculateCartTotals();
+
             // Send the updated quantity to the backend
             fetch('/cart/update-quantity/', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}',
-    },
-    body: JSON.stringify({
-        product_id: productId,
-        quantity: quantity
-    })
-})
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                },
+                body: JSON.stringify({
+                    product_id: productId,
+                    quantity: quantity
+                })
+            })
             .then(response => response.json())
             .then(data => {
                 if (!data.success) {
@@ -175,6 +176,7 @@
             .then(data => {
                 if (data.success) {
                     this.closest('tr').remove();
+                    calculateCartTotals();
                 } else {
                     alert('Failed to remove item from cart.');
                 }
@@ -185,8 +187,5 @@
         });
     });
 });
-
-
-    </script>
-    
+</script>
 {% endblock %}
