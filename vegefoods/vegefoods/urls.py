@@ -28,6 +28,7 @@ urlpatterns = [
     path('profile/',include('profile_app.urls')),
     path('address/',include('address_app.urls')),
     path('cart/',include('cart_app.urls')),
+    path('checkout/',include('order_app.urls')),
 
     path('', views.redirect_to_home),  # Redirect root URL to /user/home
 ]
