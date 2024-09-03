@@ -3,7 +3,7 @@ from django.contrib.auth.decorators import login_required
 from django.urls import reverse
 from .models import Address, Order, OrderItem, Product
 from cart_app.models import Cart, CartItem
-from decimal import Decimal  # Import Decimal
+from decimal import Decimal  
 
 @login_required
 def place_order(request):
@@ -11,28 +11,31 @@ def place_order(request):
     address = Address.objects.filter(user=user)
     cart = Cart.objects.get(user=user)
     cart_items = CartItem.objects.filter(cart=cart)
+
     
-    # Calculate the total price
-    total_price = Decimal('0.00')
+    subtotal_price = Decimal('0.00')
+    cart_items_with_subtotals = []
+
+    
     for item in cart_items:
-        # Convert quantity to Decimal to avoid type errors
         quantity = Decimal(item.quantity)
-        
         if item.product.category.category_unit == 'kg':
-            price_per_kg = item.product.price  # Assuming this is already a DecimalField
-            subtotal_price = price_per_kg * quantity
+            item_price = item.product.price * quantity
         elif item.product.category.category_unit == 'pack':
-            price_per_pack = item.product.price  # Assuming this is already a DecimalField
-            subtotal_price = price_per_pack * quantity
+            item_price = item.product.price * quantity
         else:
-            # Handle cases where the unit is neither 'kg' nor 'pack'
-            subtotal_price = item.product.price * quantity
+            item_price = item.product.price * quantity
 
-        total_price += subtotal_price
+        subtotal_price += item_price
+        cart_items_with_subtotals.append({
+            'item': item,
+            'item_subtotal': item_price
+        })
 
-    # Add delivery charge based on subtotal
-    delivery_charge = Decimal('40.00') if total_price <= Decimal('200.00') else Decimal('0.00')
-    total_price += delivery_charge
+    delivery_charge = Decimal('40.00') if subtotal_price <= Decimal('200.00') else Decimal('0.00')
+
+    
+    total_price = subtotal_price + delivery_charge
 
     if request.method == 'POST':
         selected_address_id = request.POST.get('address')
@@ -41,9 +44,11 @@ def place_order(request):
         if not selected_address_id or not payment_type:
             return render(request, 'user/checkout.html', {
                 'address': address,
-                'cart_items': cart_items,
+                'cart_items': cart_items_with_subtotals,
                 'cart': cart,
-                'total_price': total_price,  # Pass the total price to the template
+                'subtotal_price': subtotal_price,
+                'delivery_charge': delivery_charge,
+                'total_price': total_price,
                 'error_message': 'Please select an address and a payment method.'
             })
 
@@ -56,23 +61,19 @@ def place_order(request):
         )
 
         for item in cart_items:
-            # Ensure price calculation uses Decimal
+            quantity = Decimal(item.quantity)
             if item.product.category.category_unit == 'kg':
-                price_per_kg = item.product.price
-                quantity = Decimal(item.quantity)
-                subtotal_price = price_per_kg * quantity
+                subtotal_price = item.product.price * quantity
             elif item.product.category.category_unit == 'pack':
-                price_per_pack = item.product.price
-                quantity = Decimal(item.quantity)
-                subtotal_price = price_per_pack * quantity
+                subtotal_price = item.product.price * quantity
             else:
-                subtotal_price = item.product.price * Decimal(item.quantity)
+                subtotal_price = item.product.price * quantity
 
             OrderItem.objects.create(
                 order=new_order,
                 product=item.product,
                 quantity=item.quantity,
-                price=item.product.price,  # Price per unit
+                price=item.product.price,
                 subtotal_price=subtotal_price
             )
 
@@ -81,11 +82,12 @@ def place_order(request):
 
     return render(request, 'user/checkout.html', {
         'address': address,
-        'cart_items': cart_items,
+        'cart_items': cart_items_with_subtotals,  
         'cart': cart,
-        'total_price': total_price  # Pass the total price to the template
+        'subtotal_price': subtotal_price,
+        'delivery_charge': delivery_charge,
+        'total_price': total_price
     })
-
 @login_required
 def order_success(request):
     return render(request,'user/order_confirm.html')
@@ -95,21 +97,25 @@ def order_success(request):
 def user_order_details(request):
 
     user = request.user
-    orders = Order.objects.filter(user=user).order_by('-created_at')  # Fetch orders for the logged-in user
+    orders = Order.objects.filter(user=user).order_by('-created_at')  
    
-    order_items = OrderItem.objects.filter(order__in=orders)  # Fetch order items for those orders
+    order_items = OrderItem.objects.filter(order__in=orders)  
 
     return render(request, 'user/user_order/orderlist.html', {'order_items': order_items})
 
 def admin_order_list(request):
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return redirect('admin_login') 
     orders = Order.objects.all()
     return render(request,'admin/order_admin.html',{'order':orders})
 
 
 def admin_order_details(request, order_id):
+    if not request.user.is_authenticated or not request.user.is_superuser:
+        return redirect('admin_login') 
     order = get_object_or_404(Order, id=order_id)
     
-    # Retrieve related order items via the related name defined in OrderItem
+    
     order_items = order.items.all()
     
     context = {

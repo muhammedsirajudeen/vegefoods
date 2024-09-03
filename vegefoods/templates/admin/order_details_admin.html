@@ -81,28 +81,39 @@
                                     <div class="card mt-4">
                                         <div class="card-body">
                                             <h4>Product Details</h4>
-                                            <table class="table table-striped">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Product Name</th>
-                                                        <th>Quantity</th>
-                                                        <th>Price</th>
-                                                        <th>Status</th>
-                                                        <th>Subtotal</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {% for item in order_items %}
-                                                    <tr>
-                                                        <td>{{ item.product }}</td>
-                                                        <td>{{ item.quantity }}</td>
-                                                        <td>{{ item.price }}</td>
-                                                        <td>{{ item.status }}</td>
-                                                        <td>{{ item.subtotal_price }}</td>
-                                                    </tr>
-                                                    {% endfor %}
-                                                </tbody>
-                                            </table>
+                                          <table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Product Name</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Status</th>
+            <th>Subtotal</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in order_items %}
+        <tr>
+            <td>{{ item.product }}</td>
+            <td>{{ item.quantity }}</td>
+            <td>₹{{ item.price }}</td>
+            <td>
+                <select class="form-control">
+                    <option value="Order Pending" {% if item.status == "Order Pending" %}selected{% endif %}>Order Pending</option>
+                    <option value="Order confirmed" {% if item.status == "Order confirmed" %}selected{% endif %}>Order confirmed</option>
+                    <option value="Shipped" {% if item.status == "Shipped" %}selected{% endif %}>Shipped</option>
+                    <option value="Out For Delivery" {% if item.status == "Out For Delivery" %}selected{% endif %}>Out For Delivery</option>
+                    <option value="Delivered" {% if item.status == "Delivered" %}selected{% endif %}>Delivered</option>
+                    <option value="Cancelled" {% if item.status == "Cancelled" %}selected{% endif %}>Cancelled</option>
+                    <option value="Returned" {% if item.status == "Returned" %}selected{% endif %}>Returned</option>
+                </select>
+            </td>
+            <td>₹{{ item.subtotal_price }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
                                         </div>
                                     </div>
 
