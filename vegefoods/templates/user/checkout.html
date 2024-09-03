@@ -2,81 +2,70 @@
 {% load static %}
 {% block title %}Home - Vegefoods{% endblock %}
 
-
-{% block content %} 
-
-    <section class="ftco-section">
-        <div class="container">
-            <div class="row">
-                <!-- Left Column -->
-                <div class="col-xl-7 ftco-animate">
-                    <!-- Address Selection -->
-                    <h3 class="mb-4">Select Shipping Address</h3>
-
-                    <form action="{% url 'place_order' %}" method="post" class="address-selection-form">
-                     {% csrf_token %}
-                        <div class="row">
-                            <!-- Address 1 -->
-                           
-                            <!-- Address 2 -->
-                            
-                            {% for address in address  %}
+{% block content %}
+<section class="ftco-section">
+    <div class="container">
+        <div class="row">
+            <!-- Left Column -->
+            <div class="col-xl-7 ftco-animate">
+                <!-- Address Selection -->
+                <h3 class="mb-4">Select Shipping Address</h3>
+                
+                <form action="{% url 'place_order' %}" method="post" class="address-selection-form">
+                    {% csrf_token %}
+                    <div class="row">
+                        {% for address in address %}
                         <div class="col-md-12 address-container">
-                                <div class="form-group">
-                                    <input type="radio" id="address{{ address.id }}" name="address" value="{{ address.id }}">
-                                    <label for="address2">
-                                        <h4 class="address-title">{{address.address_type}}</h4>
-                                        <p class="address-details">{{address.address}}</p>
-                                    </label>
+                            <div class="form-group">
+                                <input type="radio" id="address{{ address.id }}" name="address" value="{{ address.id }}">
+                                <label for="address{{ address.id }}">
+                                    <h4 class="address-title">{{ address.address_type }}</h4>
+                                    <p class="address-details">{{ address.address }}</p>
+                                </label>
+                            </div>
+                            <hr class="address-divider">
+                        </div>
+                        {% endfor %}
+                        <!-- Add New Address Button -->
+                        <div class="col-md-12">
+                            <button type="button" class="btn btn-primary" id="add-new-address-btn">Add New Address</button>
+                        </div>
+                    </div>
+                
+                    <!-- Cart List -->
+                    <div class="cart-list mt-4">
+                        <h4>Cart Summary</h4>
+                        <div class="cart-items">
+                            {% for item in cart_items %}
+                            <div class="cart-item card mb-3 p-3 shadow-sm border-0">
+                                <div class="d-flex align-items-center">
+                                    <div class="product-image mr-3">
+                                        <img src="{{ item.product.image_1.url }}" alt="{{ item.product.name }}" class="img-fluid rounded" style="width: 80px;">
+                                    </div>
+                                    <div class="product-details flex-grow-1">
+                                        <h5 class="mb-1">{{ item.product.name }}</h5>
+                                        <span class="text-muted">Quantity: {{ item.quantity }} {{ item.product.category.category_unit }}</span>
+                                    </div>
+                                    <div class="total-price">
+                                        <span class="font-weight-bold">${{ item.subtotal_price }}</span>
+                                    </div>
                                 </div>
-                                <hr class="address-divider">
                             </div>
                             {% endfor %}
-                           
-                            <!-- Add New Address Button -->
-                            <div class="col-md-12">
-                                <button type="button" class="btn btn-primary" id="add-new-address-btn">Add New Address</button>
-                            </div>
                         </div>
-                    </form>
+                    </div>
+                    
+                </div>
 
-                    <!-- Cart List -->
-<div class="cart-list mt-4">
-    <h4>Cart Summary</h4>
-    <div class="cart-items">
-        <!-- Cart Item 1 -->
-        <!-- Cart Item 2 -->
-        {% for item in cart_items %}
-        <div class="cart-item card mb-3 p-3 shadow-sm border-0">
-            <div class="d-flex align-items-center">
-                <div class="product-image mr-3">
-                    <img src="{{item.product.image_1.url}}" alt="Apple" class="img-fluid rounded" style="width: 80px;">
-                </div>
-                <div class="product-details flex-grow-1">
-                    <h5 class="mb-1">{{item.product.name}}</h5>
-                    <span class="text-muted">Quantity: {{ item.quantity }}{{ item.product.category.category_unit}}</span>
-                </div>
-                <div class="total-price">
-                    <span class="font-weight-bold">$15.70</span>
-                </div>
-            </div>
-        </div>
-        {% endfor %}
-        <!-- More cart items can be added in the same format -->
-    </div>
-</div>
-
-                </div>
-                
-
+                <!-- Right Column -->
                 <div class="col-xl-5">
                     <div class="row mt-5 pt-3">
                         <div class="col-md-12 d-flex mb-5">
                             <div class="cart-detail cart-total p-3 p-md-4">
                                 <h3 class="billing-heading mb-4">Cart Total</h3>
                                 <p class="d-flex">
-                                    <span>Subtotal</span>
-                                    <span>$20.60</span>
+                                    <span>{{subtotal_price}}</span>
+                                    <span>${{ cart.total_price }}</span>
                                 </p>
                                 <p class="d-flex">
                                     <span>Delivery</span>
@@ -89,53 +78,46 @@
                                 <hr>
                                 <p class="d-flex total-price">
                                     <span>Total</span>
-                                    <span>$17.60</span>
+                                    <span>${{  total_price }}</span>
                                 </p>
                             </div>
                         </div>
-                        <form action="{% url 'place_order' %}" method="post">
-    {% csrf_token %}
-    <!-- Address Selection and other form fields -->
-
-    <div class="col-md-12">
-        <div class="cart-detail p-3 p-md-4">
-            <h3 class="billing-heading mb-4">Payment Method</h3>
-            <div class="form-group">
-                <div class="col-md-12">
-                    <div class="radio">
-                        <label><input type="radio" name="optradio" value="bank_transfer" class="mr-2"> Direct Bank Transfer</label>
+                        
+                        <div class="col-md-12">
+                            <div class="cart-detail p-3 p-md-4">
+                                <h3 class="billing-heading mb-4">Payment Method</h3>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio" value="bank_transfer" class="mr-2"> Direct Bank Transfer</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio" value="check_payment" class="mr-2"> Check Payment</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-md-12">
+                                        <div class="radio">
+                                            <label><input type="radio" name="optradio" value="Cash on Delivery" class="mr-2"> Cash on Delivery</label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-12">
+                            <button type="submit" class="btn btn-primary py-3 px-4">Place an order</button>
+                        </div>
                     </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    <div class="radio">
-                        <label><input type="radio" name="optradio" value="check_payment" class="mr-2"> Check Payment</label>
-                    </div>
-                </div>
-            </div>
-            <div class="form-group">
-                <div class="col-md-12">
-                    <div class="radio">
-                        <label><input type="radio" name="optradio" value="Cash on Delivery" class="mr-2"> Paypal</label>
-                    </div>
-                </div>
+                </form>
+                
             </div>
         </div>
     </div>
-                                <form action="{% url 'place_order' %}" method="post">
-    {% csrf_token %}
-    <!-- Form fields go here (address selection, payment type, etc.) -->
-    <p><button type="submit" class="btn btn-primary py-3 px-4">Place an order</button></p>
-</form>
-
-                            </div>
-                        </div>
-                    </div>
-                </div> <!-- .col-md-8 -->
-            </div>
-        </div>
-    </section> <!-- .section -->
-
-    
+</section>
 {% endblock %}

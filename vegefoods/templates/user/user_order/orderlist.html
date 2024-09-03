@@ -1,0 +1,53 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}Order List - Vegefoods{% endblock %}
+
+{% block content %} 
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="bg-white p-4">
+                    <h3>Order List</h3>
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Image</th>
+                                <th>Item Name</th>
+                                <th>Quantity</th>
+                                <th>Price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Repeat this row for each order item -->
+                            {% for item in order_items %}
+                            <tr>
+                                <td>
+                                    <img src="{{ item.product.image_1.url }}" alt="{{ item.product.name }}" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;">
+                                </td>
+                                <td>{{ item.product }}</td>
+                                <td>{{ item.quantity }}</td>
+                                <td>${{ item.subtotal_price }}</td>
+                                <td>
+                                    <span style="color: red;">{{ item.status }}</span>
+                                </td>
+                                <td>
+                                    <a href="" class="btn btn-primary">View Details</a>
+                                </td>
+                            </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="6" class="text-center">No orders found.</td>
+                            </tr>
+                            {% endfor %}
+                            <!-- End repeat -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

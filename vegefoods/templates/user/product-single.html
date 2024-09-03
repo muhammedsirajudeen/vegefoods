@@ -3,6 +3,7 @@
 {% block title %}Shop - Vegefoods{% endblock %}
 
 {% block content %} 
+
 <div class="breadcrumb-wrap" style="padding: 15px 0; background-color: #f8f9fa; border-bottom: 1px solid #ddd;">
     <div class="container">
         <p class="breadcrumbs" style="font-size: 18px; font-weight: 500; color: #333; margin: 0; display: flex; align-items: center;">
@@ -141,11 +142,14 @@
                         <p style="color: #000;">{{ product.available_stock }}{{ product.category.category_unit }} available</p>
                     {% endif %}                    </div>
                 </div>
-                <!-- <p><a href="cart.html" class="btn btn-black py-3 px-5 ">Add to Cart</a></p> -->
+               <p>
+    <a id="addToCartBtn" class="btn btn-black py-3 px-5" href="#" role="button">
+        Add to Cart
+    </a>
+</p>
 
-                <button id="addToCartBtn" class="btn btn-black py-3 px-5">
-                    Add to Cart
-                </button>                {% else %}
+
+             {% else %}
                 <p>{{product.description}}</p>
                 <div class="row mt-4">
                     <div class="col-md-6">
