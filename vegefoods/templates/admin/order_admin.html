@@ -53,10 +53,10 @@
                         <thead>
                           <tr>
                             <th>Order ID</th>
+                            <th>Order number</th>
                             <th>Name</th>
                             <th>Date of Order</th>
-                            
-                            <th>Status</th>
+     
                             <th>Action</th>
                           </tr>
                         </thead>
@@ -64,18 +64,11 @@
                           <!-- Loop through orders -->
                           {% for order in order %}
                           <tr>
+                          <td>{{ order.id  }}</td>
                             <td>{{ order.order_number  }}</td>
                             <td>{{ order.address.name }}</td>
                             <td>{{ order.created_at }}</td>
-                           
-                            <td>
-                              <select class="form-control">
-                                <option {% if order.status == 'Pending' %}selected{% endif %}>Pending</option>
-                                <option {% if order.status == 'Shipped' %}selected{% endif %}>Shipped</option>
-                                <option {% if order.status == 'Delivered' %}selected{% endif %}>Delivered</option>
-                                <option {% if order.status == 'Cancelled' %}selected{% endif %}>Cancelled</option>
-                              </select>
-                            </td>
+      
                            <td>
 <a href="{% url 'order-view' order.id %}" class="btn btn-info">View More</a>
 </td>

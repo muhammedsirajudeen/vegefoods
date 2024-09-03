@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 from product_apps.models import Product
 from address_app.models import Address 
 import uuid
-from django.utils import timezone  # Import timezone for the generate_order_number method
+from django.utils import timezone  
 
 class Order(models.Model):
     PAYMENT_CHOICES = [
@@ -27,7 +27,7 @@ class Order(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.order_number:
-            self.order_number = str(uuid.uuid4().hex[:8])  # Generate a unique order number
+            self.order_number = str(uuid.uuid4().hex[:8])  
         super().save(*args, **kwargs)
 
 class OrderItem(models.Model):
@@ -44,7 +44,7 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     quantity = models.FloatField(default=0)
     price = models.DecimalField(max_digits=10, decimal_places=2)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Order Pending')  # Updated default
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Order Pending') 
     subtotal_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
