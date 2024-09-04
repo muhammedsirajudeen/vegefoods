@@ -101,10 +101,41 @@
 				{%  endfor %}
     		</div>
     		<div class="row mt-5">
-          <div class="col text-center">
-            
-          </div>
-        </div>
+          <!-- <div class="col text-center">
+            <div class="block-27">
+              <ul>
+                <li><a href="#">&lt;</a></li>
+                <li class="active"><span>1</span></li>
+                <li><a href="#">2</a></li>
+                <li><a href="#">3</a></li>
+                <li><a href="#">4</a></li>
+                <li><a href="#">5</a></li>
+                <li><a href="#">&gt;</a></li>
+              </ul>
+            </div>
+          </div> -->
+		  <div class="col text-center">
+			<div class="block-27">
+				<ul>
+					{% if products.has_previous %}
+						<li><a href="?page={{ products.previous_page_number }}&category={{ selected_category }}&sort_by={{ selected_sort }}">&lt;</a></li>
+					{% endif %}
+		
+					{% for num in products.paginator.page_range %}
+						{% if products.number == num %}
+							<li class="active"><span>{{ num }}</span></li>
+						{% else %}
+							<li><a href="?page={{ num }}&category={{ selected_category }}&sort_by={{ selected_sort }}">{{ num }}</a></li>
+						{% endif %}
+					{% endfor %}
+		
+					{% if products.has_next %}
+						<li><a href="?page={{ products.next_page_number }}&category={{ selected_category }}&sort_by={{ selected_sort }}">&gt;</a></li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+		
     	</div>
     </section>
 
