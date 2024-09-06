@@ -90,7 +90,7 @@
 	    							<a href="#" class="buy-now d-flex justify-content-center align-items-center mx-1">
 	    								<span><i class="ion-ios-cart"></i></span>
 	    							</a>
-	    							<a href="#" class="heart d-flex justify-content-center align-items-center ">
+	    							<a href="{% url 'add_wishlist' product.id %}" class="heart d-flex justify-content-center align-items-center ">
 	    								<span><i class="ion-ios-heart"></i></span>
 	    							</a>
     							</div>
@@ -101,7 +101,7 @@
 				{%  endfor %}
     		</div>
     		<div class="row mt-5">
-          <div class="col text-center">
+          <!-- <div class="col text-center">
             <div class="block-27">
               <ul>
                 <li><a href="#">&lt;</a></li>
@@ -113,8 +113,29 @@
                 <li><a href="#">&gt;</a></li>
               </ul>
             </div>
-          </div>
-        </div>
+          </div> -->
+		  <div class="col text-center">
+			<div class="block-27">
+				<ul>
+					{% if products.has_previous %}
+						<li><a href="?page={{ products.previous_page_number }}&category={{ selected_category }}&sort_by={{ selected_sort }}">&lt;</a></li>
+					{% endif %}
+		
+					{% for num in products.paginator.page_range %}
+						{% if products.number == num %}
+							<li class="active"><span>{{ num }}</span></li>
+						{% else %}
+							<li><a href="?page={{ num }}&category={{ selected_category }}&sort_by={{ selected_sort }}">{{ num }}</a></li>
+						{% endif %}
+					{% endfor %}
+		
+					{% if products.has_next %}
+						<li><a href="?page={{ products.next_page_number }}&category={{ selected_category }}&sort_by={{ selected_sort }}">&gt;</a></li>
+					{% endif %}
+				</ul>
+			</div>
+		</div>
+		
     	</div>
     </section>
 

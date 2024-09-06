@@ -6,6 +6,7 @@ from . forms import ProductForm
 from django.db.models import  F
 from django.contrib import messages
 import re
+from django.core.paginator import Paginator,PageNotAnInteger,EmptyPage
 # Create your views here.
 
 
@@ -27,12 +28,16 @@ def product_list(request):
         form = ProductForm()
         errors = None
 
-    product = Product.objects.all()
+    products_list = Product.objects.all()
+    paginator = Paginator(products_list, 10)  # Show 10 products per page
+    page_number = request.GET.get('page')
+    products = paginator.get_page(page_number)
     categories = Category.objects.all()
+    
     
     return render(request, 'admin/product.html', {
         'form': form,
-        'product': product,
+        'product': products,
         'categories': categories,
         'errors': errors,
     })
@@ -125,8 +130,12 @@ def user_products(request):
     username = request.user.username
     category = request.GET.get('category', 'All') 
     sort_by = request.GET.get('sort_by', 'default') 
+    page_number = request.GET.get('page',1)
+    search_query = request.GET.get('search', '')
 
-    if category == 'All':
+    if search_query:
+        product_list = Product.objects.filter(product_name__icontains=search_query)
+    elif category == 'All':
         product_list = Product.objects.all()
     else:
         product_list = Product.objects.filter(category__category_name=category)
@@ -138,10 +147,17 @@ def user_products(request):
     elif sort_by == 'discount':
         product_list = product_list.order_by('-offer')
     
-    
+    paginator = Paginator(product_list,2)
 
+    try:
+        products = paginator.page(page_number)
+    except PageNotAnInteger:
+        products = paginator.page(1)
+    except EmptyPage:
+        products = paginator.page(paginator.num_pages)
+        
     return render(request, 'user/shop.html', {
-        'products': product_list,
+        'products': products,
         'username': username,
         'selected_category': category,
         'selected_sort': sort_by,
