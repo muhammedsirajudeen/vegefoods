@@ -97,7 +97,7 @@ def order_success(request):
 
 
 @login_required
-def user_order_details(request):
+def user_order_list(request):
 
     user = request.user
     orders = Order.objects.filter(user=user).order_by('-created_at')  
@@ -116,9 +116,8 @@ def admin_order_list(request):
 def admin_order_details(request, order_id):
     if not request.user.is_authenticated or not request.user.is_superuser:
         return redirect('admin_login') 
+
     order = get_object_or_404(Order, id=order_id)
-    
-    
     order_items = order.items.all()
     
     context = {
@@ -182,3 +181,26 @@ def add_address_checkout(request):
         return redirect('place_order')  # Redirect to address list page after saving
 
     return render(request, "user/address_app/add_addresscheckout.html")
+
+
+
+
+def user_order_details(request):
+    return render(request,"user/orderdetails.html")
+
+def update_order_status(request,order_id):
+    order = get_object_or_404(Order, id=order_id)
+    
+    if request.method == 'POST':
+        # Iterate through each order item to update status
+        for item in order.items.all():
+            new_status = request.POST.get(f'status_{item.id}')
+            print(new_status)
+            if new_status:
+                item.status = new_status
+                item.save()
+        
+        return redirect('order-managment')  # Redirect to the admin order list
+
+    # If GET request, redirect to order details or some other page
+    return redirect('admin_order_details', order_id=order_id)

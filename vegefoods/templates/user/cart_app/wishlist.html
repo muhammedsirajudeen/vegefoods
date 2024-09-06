@@ -1,0 +1,49 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}Cart - Vegefoods{% endblock %}
+
+{% block content %}
+    <section class="ftco-section ftco-cart">
+			<div class="container">
+				<div class="row">
+    			<div class="col-md-12 ftco-animate">
+    				<div class="cart-list">
+	    				<table class="table">
+						    <thead class="thead-primary">
+						      <tr class="text-center">
+						        <th>&nbsp;</th>
+						        <th>Product List</th>
+						        <th>Name</th>
+						        <th>Price</th>
+						        
+						      </tr>
+						    </thead>
+						    <tbody>
+								{% for item in wishlist_items %}
+						      <tr class="text-center">
+						        <td class="product-remove"><a href="{% url 'remove_wishlist' item.product.id %}"><span class="ion-ios-close"></span></a></td>
+						        
+						        <td class="image-prod"><div class="img" style="background-image:url('{{ item.product.image_1.url }}');"></div></td>
+						        
+						        <td class="product-name">
+									<a href="{% url 'product_details' item.product.id %}"><h3>{{item.product.product_name}}</h3></a>
+						        	
+						        	
+						        </td>
+						        
+						       
+						        
+						       
+						        
+						        <td class="total">₹{{item.product.price}}</td>
+						      </tr><!-- END TR-->
+							  {% endfor %}
+						    </tbody>
+						  </table>
+					  </div>
+    			</div>
+    		</div>
+			</div>
+		</section>
+
+	{% endblock %}

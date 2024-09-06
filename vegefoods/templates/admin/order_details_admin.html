@@ -81,6 +81,8 @@
                                     <div class="card mt-4">
                                         <div class="card-body">
                                             <h4>Product Details</h4>
+                                            <form method="POST" action="{% url 'update_order_status' order.id %}">
+                                                {% csrf_token %}
                                           <table class="table table-striped">
     <thead>
         <tr>
@@ -98,21 +100,50 @@
             <td>{{ item.quantity }}</td>
             <td>₹{{ item.price }}</td>
             <td>
-                <select class="form-control">
-                    <option value="Order Pending" {% if item.status == "Order Pending" %}selected{% endif %}>Order Pending</option>
-                    <option value="Order confirmed" {% if item.status == "Order confirmed" %}selected{% endif %}>Order confirmed</option>
-                    <option value="Shipped" {% if item.status == "Shipped" %}selected{% endif %}>Shipped</option>
-                    <option value="Out For Delivery" {% if item.status == "Out For Delivery" %}selected{% endif %}>Out For Delivery</option>
-                    <option value="Delivered" {% if item.status == "Delivered" %}selected{% endif %}>Delivered</option>
-                    <option value="Cancelled" {% if item.status == "Cancelled" %}selected{% endif %}>Cancelled</option>
-                    <option value="Returned" {% if item.status == "Returned" %}selected{% endif %}>Returned</option>
+                <select class="form-control" name="status_{{ item.id }}">
+                    {% if item.status == "Order Pending" %}
+                        <option value="Order Pending" selected>Order Pending</option>
+                        <option value="Order confirmed">Order confirmed</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Out For Delivery">Out For Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Returned">Returned</option>
+                    {% elif item.status == "Order confirmed" %}
+                        <option value="Order confirmed" selected>Order confirmed</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="Out For Delivery">Out For Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Returned">Returned</option>
+                    {% elif item.status == "Shipped" %}
+                        <option value="Shipped" selected>Shipped</option>
+                        <option value="Out For Delivery">Out For Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Returned">Returned</option>
+                    {% elif item.status == "Out For Delivery" %}
+                        <option value="Out For Delivery" selected>Out For Delivery</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Returned">Returned</option>
+                    {% elif item.status == "Delivered" %}
+                        <option value="Delivered" selected>Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                    {% elif item.status == "Cancelled" %}
+                        <option value="Cancelled" selected>Cancelled</option>
+                    {% elif item.status == "Returned" %}
+                        <option value="Returned" selected>Returned</option>
+                    {% endif %}
                 </select>
             </td>
             <td>₹{{ item.subtotal_price }}</td>
         </tr>
         {% endfor %}
+        
     </tbody>
 </table>
+<button type="submit" class="btn btn-primary">Update Status</button>
 
                                         </div>
                                     </div>

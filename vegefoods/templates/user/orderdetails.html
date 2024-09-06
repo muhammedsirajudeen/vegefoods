@@ -1,0 +1,83 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}Order List - Vegefoods{% endblock %}
+
+{% block content %} 
+
+  <section class="ftco-section bg-light">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="bg-white p-4">
+            <h3>Order #12345 Details</h3>
+            <div class="row">
+              <div class="col-md-8">
+                <h4>Shipping Information</h4>
+                <p><strong>Shipping Address:</strong></p>
+                <p>1234 Elm Street, Apt 567, Springfield, IL, 62704, USA</p>
+               
+                
+                <h4 class="mt-4">Order Items</h4>
+                <table class="table table-bordered">
+                  <thead>
+                    <tr>
+                      <th>Image</th>
+                      <th>Item Name</th>
+                      <th>Quantity</th>
+                      <th>Price</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <!-- Repeat this row for each order item -->
+                    <tr>
+                      <td><img src="images/product-10.jpg" alt="Item 1" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"></td>
+                      <td>Item 1</td>
+                      <td>2</td>
+                      <td>$30.00</td>
+                    </tr>
+                   
+                    <!-- End repeat -->
+                  </tbody>
+                </table>
+                
+                <h4 class="mt-4">Total Amount</h4>
+                <p><strong>$50.00</strong></p>
+                
+
+
+<!-- Review Submission Form -->
+<h5 class="mt-4">Submit Your Review</h5>
+<form action="/submit_review" method="POST">
+  <div class="form-group">
+    <label for="rating">Rating:</label>
+    <div class="review-stars">
+        <div class="review-stars">
+            <span>&#9733;</span>
+            <span>&#9733;</span>
+            <span>&#9733;</span>
+            <span>&#9733;</span>
+            <span>&#9733;</span>
+          </div>
+    </div>
+  </div>
+  <div class="form-group">
+    <label for="review">Your Review:</label>
+    <textarea name="review" id="review" class="form-control" rows="3" placeholder="Write your review here..." required></textarea>
+  </div>
+  <button type="submit" class="btn btn-primary">Submit Review</button>
+</form>
+
+              </div>
+              <div class="col-md-4">
+                <h4 class="mt-4">Invoice</h4>
+                <form method="POST" action="/download_invoice">
+                  <button type="submit" class="btn btn-primary">Download Invoice</button>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  {% endblock %}

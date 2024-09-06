@@ -74,3 +74,5 @@ def remove_from_cart(request, product_id):
 
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'message': 'User not authenticated or invalid request'})
+
+

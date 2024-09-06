@@ -34,7 +34,7 @@
                                     <span style="color: red;">{{ item.status }}</span>
                                 </td>
                                 <td>
-                                    <a href="" class="btn btn-primary">View Details</a>
+                                    <a href="{% url 'order_details' %}" class="btn btn-primary">View Details</a>
                                 </td>
                             </tr>
                             {% empty %}
