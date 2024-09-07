@@ -30,7 +30,7 @@ urlpatterns = [
     path('cart/',include('cart_app.urls')),
     path('checkout/',include('order_app.urls')),
     path('wishlist/',include('wishlist_app.urls')),
-    path('coupen/',include('coupen_app.urls')),
+    path('coupon/',include('coupen_app.urls')),
     path('', views.redirect_to_home),  # Redirect root URL to /user/home
 ]
 

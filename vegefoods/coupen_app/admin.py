@@ -1,6 +1,6 @@
 from django.contrib import admin
-from . models import Coupen,UserCoupen
+from . models import Coupon,UserCoupon
 
 # Register your models here.
-admin.site.register(Coupen)
-admin.site.register(UserCoupen)
+admin.site.register(Coupon)
+admin.site.register(UserCoupon)
