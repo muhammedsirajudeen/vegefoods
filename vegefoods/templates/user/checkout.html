@@ -62,62 +62,76 @@
                 </div>
 
                 <!-- Right Column -->
-                <div class="col-xl-5">
-                    <div class="row mt-5 pt-3">
-                        <div class="col-md-12 d-flex mb-5">
-                            <div class="cart-detail cart-total p-3 p-md-4">
-                                <h3 class="billing-heading mb-4">Cart Total</h3>
-                                <p class="d-flex">
-                                    <span>Subtotal</span>
-                                    <span>₹{{ subtotal_price }}</span>
-                                </p>
-                                <p class="d-flex">
-                                    <span>Delivery</span>
-                                    <span>₹{{delivery_charge}}</span>
-                                </p>
-                              
-                                <hr>
-                                <p class="d-flex total-price">
-                                    <span>Total</span>
-                                    <span>₹{{  total_price }}</span>
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-12">
-                            <div class="cart-detail p-3 p-md-4">
-                                <h3 class="billing-heading mb-4">Payment Method</h3>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="radio">
-                                            <label><input type="radio" name="optradio" value="bank_transfer" class="mr-2"> Direct Bank Transfer</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="radio">
-                                            <label><input type="radio" name="optradio" value="check_payment" class="mr-2"> Check Payment</label>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="form-group">
-                                    <div class="col-md-12">
-                                        <div class="radio">
-                                            <label><input type="radio" name="optradio" value="Cash on Delivery" class="mr-2"> Cash on Delivery</label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="col-md-12">
-                            <button type="submit" class="btn btn-primary py-3 px-4">Place an order</button>
+              <!-- Right Column -->
+<div class="col-xl-5">
+    <div class="row mt-5 pt-3">
+        <div class="col-md-12 d-flex mb-5">
+            <div class="cart-detail cart-total p-3 p-md-4">
+                <h3 class="billing-heading mb-4">Cart Total</h3>
+                <p class="d-flex">
+                    <span>Subtotal</span>
+                    <span>₹{{ subtotal_price }}</span>
+                </p>
+                <p class="d-flex">
+                    <span>Delivery</span>
+                    <span>₹{{delivery_charge}}</span>
+                </p>
+                
+                <hr>
+                <p class="d-flex total-price">
+                    <span>Total</span>
+                    <span>₹{{ total_price }}</span>
+                </p>
+            </div>
+        </div>
+
+        <!-- Coupon Section -->
+<div class="col-md-12">
+    <div class="cart-detail p-3 p-md-4 shadow-sm border">
+        <h3 class="billing-heading mb-4">Apply Coupon</h3>
+        <div class="form-group">
+            <label for="coupon-code">Coupon Code</label>
+            <input type="text" id="coupon-code" name="coupon_code" class="form-control text-left px-3" placeholder="Enter coupon code">
+        </div>
+        <button type="button" class="btn btn-primary btn-block py-2 px-3">Apply Coupon</button>
+    </div>
+</div>
+
+
+        <!-- Payment Method Section -->
+        <div class="col-md-12">
+            <div class="cart-detail p-3 p-md-4">
+                <h3 class="billing-heading mb-4">Payment Method</h3>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="radio">
+                            <label><input type="radio" name="optradio" value="bank_transfer" class="mr-2"> Direct Bank Transfer</label>
                         </div>
                     </div>
-                </form>
-                
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="radio">
+                            <label><input type="radio" name="optradio" value="check_payment" class="mr-2"> Check Payment</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div class="col-md-12">
+                        <div class="radio">
+                            <label><input type="radio" name="optradio" value="Cash on Delivery" class="mr-2"> Cash on Delivery</label>
+                        </div>
+                    </div>
+                </div>
             </div>
+        </div>
+        
+        <div class="col-md-12">
+            <button type="submit" class="btn btn-primary py-3 px-4">Place an order</button>
+        </div>
+    </div>
+</div>
+
         </div>
     </div>
 </section>
