@@ -1,6 +1,7 @@
-from django.shortcuts import render,redirect
+from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib import messages
 from . models import Coupon
+from django.http import JsonResponse
 
 # Create your views here.
 def admin_coupon_management(request):
@@ -38,3 +39,31 @@ def admin_coupon_management(request):
     # Render the template with existing coupons
     return render(request, 'admin/coupon_admin.html', {'coupon': coupon})
 
+
+def delete_coupon(request,coupon_id):
+    
+    coupen = get_object_or_404(Coupon,id=coupon_id)
+    coupen.delete()
+    messages.success(request, 'Coupon deleted successfully!')
+    return redirect('coupon_management')
+
+
+def edit_coupon(request,coupon_id):
+
+    coupon = get_object_or_404(Coupon,id = coupon_id)
+
+    if request.method == 'POST':
+        coupon.code = request.POST.get('code')
+        coupon.discount_value = request.POST.get('discount_value')  # removed the comma
+        coupon.min_purchase_amount = request.POST.get('min_purchase_amount')  # removed the comma
+        coupon.valid_from = request.POST.get('valid_from')
+        coupon.valid_to = request.POST.get('valid_to')
+        coupon.usage_limit = request.POST.get('usage_limit')
+
+
+        coupon.save()
+        
+        messages.success(request,"success update")
+        return redirect('coupon_management')
+
+    return render(request, 'admin/edit_coupon.html', {'coupon': coupon})
