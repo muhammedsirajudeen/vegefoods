@@ -9,14 +9,51 @@
       <div class="row">
         <div class="col-md-12">
           <div class="bg-white p-4">
-            <h3>Order #12345 Details</h3>
+            <h3>Order #{{order.order_number}} Details</h3>
             <div class="row">
               <div class="col-md-8">
                 <h4>Shipping Information</h4>
-                <p><strong>Shipping Address:</strong></p>
-                <p>1234 Elm Street, Apt 567, Springfield, IL, 62704, USA</p>
-               
+                <p><strong>Shipping Details:</strong></p>
+                <p>{{order.address.name}}</p>
+                <p>{{order.address.landmark}},{{order.address.district}},{{order.address.state}} {{order.address.pincode}}
+                  {{order.address.country}}
+                </p>
+                <p>phone number: {{order.address.phone_number}}</p>
+                <!-- progress bar -->
+            <!-- progress bar -->
+<div class="progress-container">
+  <div class="progress-bar-container">
+    {% if order_items.status == "Order Pending" %}
+      <div class="progress-bar bg-info" style="width: 25%;" aria-valuenow="25" aria-valuemin="0" aria-valuemax="100">Order Pending</div>
+    {% elif order_items.status == "Order confirmed" %}
+      <div class="progress-bar bg-info" style="width: 50%;" aria-valuenow="50" aria-valuemin="0" aria-valuemax="100">Order Confirmed</div>
+    {% elif order_items.status == "Shipped" %}
+      <div class="progress-bar bg-warning" style="width: 75%;" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">Shipped</div>
+    {% elif order_items.status == "Out For Delivery" %}
+      <div class="progress-bar bg-warning" style="width: 90%;" aria-valuenow="90" aria-valuemin="0" aria-valuemax="100">Out For Delivery</div>
+    {% elif order_items.status == "Delivered" %}
+      <div class="progress-bar bg-success" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Delivered</div>
+    {% elif order_items.status == "Cancelled" or order_items.status == "Approve Returned" %}
+      <div class="progress-bar bg-danger" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{ order_items.status }}</div>
+    {% endif %}
+  </div>
+</div>
+
                 
+                <!-- prigress bar end -->
+                <div class="order-actions mt-3">
+                  {% if  order_items.status == "Delivered" %}
+                
+                    <form action="" method="POST">
+                      <button type="submit" class="btn btn-secondary">Return Order</button>
+                    </form>
+                    {% elif order_items.status == "Order Pending" or order_items.status == "Order confirmed" or order_items.status == "Shipped" or order_items.status == "Out For Delivery" %}                    <!-- Show Cancel Option before the order is delivered -->
+                    <form action="" method="POST">
+                      <button type="submit" class="btn btn-danger">Cancel Order</button>
+                    </form>
+                  {% endif %}
+                </div>
+
                 <h4 class="mt-4">Order Items</h4>
                 <table class="table table-bordered">
                   <thead>
@@ -29,11 +66,12 @@
                   </thead>
                   <tbody>
                     <!-- Repeat this row for each order item -->
+                   
                     <tr>
-                      <td><img src="images/product-10.jpg" alt="Item 1" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"></td>
-                      <td>Item 1</td>
-                      <td>2</td>
-                      <td>$30.00</td>
+                      <td><img src="{{ order_items.product.image_1.url }}" alt="Item 1" class="img-fluid rounded-circle" style="width: 100px; height: 100px; object-fit: cover;"></td>
+                      <td>{{order_items.product}}</td>
+                      <td>{{order_items.quantity}} {{order_items.product.category.category_unit}}</td>
+                      <td>₹{{order_items.subtotal_price }}</td>
                     </tr>
                    
                     <!-- End repeat -->
@@ -41,11 +79,12 @@
                 </table>
                 
                 <h4 class="mt-4">Total Amount</h4>
-                <p><strong>$50.00</strong></p>
+                <p><strong>₹{{order_items.subtotal_price }}</strong></p>
                 
 
 
 <!-- Review Submission Form -->
+{% if  order_items.status == "Delivered" %}
 <h5 class="mt-4">Submit Your Review</h5>
 <form action="/submit_review" method="POST">
   <div class="form-group">
@@ -66,14 +105,24 @@
   </div>
   <button type="submit" class="btn btn-primary">Submit Review</button>
 </form>
+{% else %}
+
+{% endif %}
 
               </div>
+              {% if  order_items.status == "Delivered" %}
               <div class="col-md-4">
                 <h4 class="mt-4">Invoice</h4>
-                <form method="POST" action="/download_invoice">
+                <form method="POST" action="{% url 'download_invoice_item' order_items.id %}">
+                  {% csrf_token %}
                   <button type="submit" class="btn btn-primary">Download Invoice</button>
                 </form>
               </div>
+              {% else %}
+              <div class="col-md-4">
+               
+              </div>
+              {% endif %}
             </div>
           </div>
         </div>

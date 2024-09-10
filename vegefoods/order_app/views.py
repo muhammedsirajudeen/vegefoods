@@ -1,9 +1,13 @@
 from django.shortcuts import render, redirect,get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.urls import reverse
-from .models import Address, Order, OrderItem, Product
+from .models import Address, Order, OrderItem, Product,Invoice
 from cart_app.models import Cart, CartItem
 from decimal import Decimal  
+from django.http import HttpResponse
+from django.template.loader import render_to_string
+from weasyprint import HTML
+import random
 
 @login_required
 def place_order(request):
@@ -100,9 +104,13 @@ def order_success(request):
 def user_order_list(request):
 
     user = request.user
-    orders = Order.objects.filter(user=user).order_by('-created_at')  
-   
-    order_items = OrderItem.objects.filter(order__in=orders)  
+    
+    orders = Order.objects.filter(user=user).order_by('-created_at')
+    # Get the IDs of the most recent orders
+    order_ids = orders.values_list('id', flat=True)
+    # Fetch order items related to these orders, ordered by their creation time
+    order_items = OrderItem.objects.filter(order__in=order_ids).order_by('-order__created_at')
+
 
     return render(request, 'user/user_order/orderlist.html', {'order_items': order_items})
 
@@ -185,8 +193,7 @@ def add_address_checkout(request):
 
 
 
-def user_order_details(request):
-    return render(request,"user/orderdetails.html")
+
 
 def update_order_status(request,order_id):
     order = get_object_or_404(Order, id=order_id)
@@ -204,3 +211,50 @@ def update_order_status(request,order_id):
 
     # If GET request, redirect to order details or some other page
     return redirect('admin_order_details', order_id=order_id)
+
+
+def user_order_details(request,order_id):
+    order_items = get_object_or_404(OrderItem, id=order_id)
+    order = order_items.order
+    context = {
+       
+        'order_items': order_items,
+        'order' : order
+    }
+    return render(request,"user/orderdetails.html",context)
+
+
+
+def generate_invoice_number():
+    """Generate a unique invoice number with pattern 'vege123123XXX'."""
+    unique_id = random.randint(100000, 999999)  # Generate random 6-digit number
+    return f"vege{unique_id}"
+
+def download_invoice_item(request, item_id):
+    order_item = OrderItem.objects.get(id=item_id)
+
+    order = order_item.order
+
+    # Get or create an invoice for the order item
+    invoice, created = Invoice.objects.get_or_create(order_item=order_item)
+
+    if created:
+        invoice.invoice_number = generate_invoice_number()
+        invoice.save()
+
+    # Generate the HTML string for the invoice (whether newly created or not)
+    html_string = render_to_string('user/user_invoice/invoice.html', {
+        'order_item': order_item,
+        'invoice_number': invoice.invoice_number,
+        'invoice_date': invoice.invoice_date,
+        'order': order,
+    })
+
+    # Create a PDF file from the HTML string
+    pdf = HTML(string=html_string).write_pdf()
+
+    # Create the HTTP response to download the PDF
+    response = HttpResponse(pdf, content_type='application/pdf')
+    response['Content-Disposition'] = f'attachment; filename="invoice_item_{order_item.id}.pdf"'
+
+    return response

@@ -38,7 +38,8 @@ class OrderItem(models.Model):
         ("Out For Delivery", "Out For Delivery"),
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled"),
-        ("Returned", "Returned"),
+        ("Approve Returned", "Approve Returned"),
+
     ]
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
@@ -49,3 +50,15 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f'{self.quantity} of {self.product.product_name} in order {self.order.id}'
+<<<<<<< HEAD
+=======
+
+
+class Invoice(models.Model):
+    order_item = models.OneToOneField(OrderItem,on_delete=models.CASCADE)
+    invoice_number = models.CharField(max_length=50,unique=True)
+    invoice_date = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return self.invoice_number
+>>>>>>> orderdetails
