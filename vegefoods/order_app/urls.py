@@ -10,6 +10,8 @@ urlpatterns = [
     path('order-view/<int:order_id>/', views.admin_order_details, name='order-view'),
     path('edit_address_checkout/<int:address_id>/', views.edit_checkout_address, name='edit_checkout_address'),
     path('add_addresses_checkout/', views.add_address_checkout, name='add_address_checkout'),
-    path('order_details/', views.user_order_details, name='order_details'),
+    path('order_details/<int:order_id>/', views.user_order_details, name='order_details'),
     path('checkout/order/<int:order_id>/update-status/', views.update_order_status, name='update_order_status'),
+    path('download_invoice_item/<int:item_id>/', views.download_invoice_item, name='download_invoice_item'),
+
     ]
