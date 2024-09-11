@@ -3,7 +3,8 @@ from django.contrib.auth.models import User
 from product_apps.models import Product
 from address_app.models import Address 
 import uuid
-from django.utils import timezone  
+from django.utils import timezone 
+from datetime import timedelta 
 
 class Order(models.Model):
     PAYMENT_CHOICES = [
@@ -26,8 +27,14 @@ class Order(models.Model):
         return f'Order {self.id} by {self.user.username}'
 
     def save(self, *args, **kwargs):
+        # Generate order number if it doesn't exist
         if not self.order_number:
-            self.order_number = str(uuid.uuid4().hex[:8])  
+            self.order_number = str(uuid.uuid4().hex[:8])
+
+        # Set estimated delivery date to 6 days from the current date if not already set
+        if not self.estimated_delivery_date:
+            self.estimated_delivery_date = timezone.now().date() + timedelta(days=6)
+
         super().save(*args, **kwargs)
 
 class OrderItem(models.Model):

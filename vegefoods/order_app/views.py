@@ -80,6 +80,18 @@ def place_order(request):
             })
 
         # Handle Cash on Delivery
+        if payment_type == 'Cash on Delivery' and total_price > Decimal('1000.00'):
+            print("not cod")
+            return render(request, 'user/checkout.html', {
+                'address': address,
+                'cart_items': cart_items_with_subtotals,
+                'cart': cart,
+                'subtotal_price': subtotal_price,
+                'delivery_charge': delivery_charge,
+                'total_price': total_price,
+                'error_message': 'Cash on Delivery is not available for orders above ₹1000.'
+            })
+
         new_order = Order.objects.create(
             user=user,
             address=selected_address,
