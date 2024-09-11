@@ -8,6 +8,13 @@ from django.http import HttpResponse
 from django.template.loader import render_to_string
 from weasyprint import HTML
 import random
+import razorpay
+from django.conf import settings
+from django.views.decorators.csrf import csrf_exempt
+
+# Razorpay client initialization
+razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
+
 
 @login_required
 def place_order(request):
@@ -16,19 +23,18 @@ def place_order(request):
     cart = Cart.objects.get(user=user)
     cart_items = CartItem.objects.filter(cart=cart)
 
-    
     subtotal_price = Decimal('0.00')
     cart_items_with_subtotals = []
 
-    
+    # Calculating the item prices based on quantity and category unit
     for item in cart_items:
         quantity = Decimal(item.quantity)
         if item.product.category.category_unit == 'kg':
-            item_price = item.product.price * quantity
+            item_price = Decimal(item.product.price) * quantity
         elif item.product.category.category_unit == 'pack':
-            item_price = item.product.price * quantity
+            item_price = Decimal(item.product.price) * quantity
         else:
-            item_price = item.product.price * quantity
+            item_price = Decimal(item.product.price) * quantity
 
         subtotal_price += item_price
         cart_items_with_subtotals.append({
@@ -37,8 +43,6 @@ def place_order(request):
         })
 
     delivery_charge = Decimal('40.00') if subtotal_price <= Decimal('200.00') else Decimal('0.00')
-
-    
     total_price = subtotal_price + delivery_charge
 
     if request.method == 'POST':
@@ -57,6 +61,25 @@ def place_order(request):
             })
 
         selected_address = Address.objects.get(id=selected_address_id)
+
+        if payment_type == 'Razor pay':
+            # Create Razorpay order
+            request.session['selected_address'] = selected_address_id
+
+            razorpay_order = razorpay_client.order.create({
+                'amount': int(Decimal(total_price) * Decimal('100')),  # amount in paisa
+                'currency': 'INR',
+                'payment_capture': '1'
+            })
+
+            return render(request, 'user/razorpay/razorpay_payment.html', {
+                'razorpay_order_id': razorpay_order['id'],
+                'razorpay_key_id': settings.RAZORPAY_KEY_ID,
+                'amount': total_price,
+                'selected_address': selected_address,
+            })
+
+        # Handle Cash on Delivery
         new_order = Order.objects.create(
             user=user,
             address=selected_address,
@@ -67,34 +90,97 @@ def place_order(request):
         for item in cart_items:
             quantity = Decimal(item.quantity)
             if item.product.category.category_unit == 'kg':
-                subtotal_price = item.product.price * quantity
+                item_price = Decimal(item.product.price) * quantity
             elif item.product.category.category_unit == 'pack':
-                subtotal_price = item.product.price * quantity
+                item_price = Decimal(item.product.price) * quantity
             else:
-                subtotal_price = item.product.price * quantity
+                item_price = Decimal(item.product.price) * quantity
 
             OrderItem.objects.create(
                 order=new_order,
                 product=item.product,
                 quantity=item.quantity,
                 price=item.product.price,
-                subtotal_price=subtotal_price
+                subtotal_price=item_price
             )
             product = item.product
             product.available_stock -= item.quantity
             product.save()
-            
+
         cart_items.delete()
         return redirect(reverse('order_success'))
 
     return render(request, 'user/checkout.html', {
         'address': address,
-        'cart_items': cart_items_with_subtotals,  
+        'cart_items': cart_items_with_subtotals,
         'cart': cart,
         'subtotal_price': subtotal_price,
         'delivery_charge': delivery_charge,
         'total_price': total_price
     })
+
+
+@csrf_exempt
+def razorpay_payment_status(request):
+    if request.method == "POST":
+        payment_id = request.POST.get("razorpay_payment_id")
+        razorpay_order_id = request.POST.get("razorpay_order_id")
+        razorpay_signature = request.POST.get("razorpay_signature")
+
+        try:
+            # Verify the Razorpay payment signature
+            razorpay_client.utility.verify_payment_signature({
+                'razorpay_order_id': razorpay_order_id,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': razorpay_signature
+            })
+
+            # Payment is successful, proceed with creating the order
+            user = request.user
+            cart = Cart.objects.get(user=user)
+            cart_items = CartItem.objects.filter(cart=cart)
+            selected_address_id = request.session.get('selected_address')
+            selected_address = Address.objects.get(id=selected_address_id)
+
+            # Create the order
+            new_order = Order.objects.create(
+                user=user,
+                address=selected_address,
+                payment_type='Razor pay',
+                total_price=sum([Decimal(item.product.price) * Decimal(item.quantity) for item in cart_items])
+            )
+
+            # Create order items and reduce stock
+            for item in cart_items:
+                quantity = Decimal(item.quantity)
+                if item.product.category.category_unit == 'kg':
+                    item_price = Decimal(item.product.price) * quantity
+                elif item.product.category.category_unit == 'pack':
+                    item_price = Decimal(item.product.price) * quantity
+                else:
+                    item_price = Decimal(item.product.price) * quantity
+
+                OrderItem.objects.create(
+                    order=new_order,
+                    product=item.product,
+                    quantity=item.quantity,
+                    price=item.product.price,
+                    subtotal_price=item_price
+                )
+                item.product.available_stock -= item.quantity
+                item.product.save()
+
+            # Clear the cart after order creation
+            cart_items.delete()
+            return redirect('order_success')
+
+        except razorpay.errors.SignatureVerificationError:
+            # Handle verification failure
+            return render(request, 'user/order_confirm.html', {
+                'error_message': 'Payment verification failed. Please try again.'
+            })
+
+    return redirect('order_success')
 @login_required
 def order_success(request):
     return render(request,'user/order_confirm.html')

@@ -164,6 +164,9 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+RAZORPAY_KEY_ID = 'rzp_test_SpXw9x6YSWHh83'
+RAZORPAY_KEY_SECRET = 'D00k06Cks8ispc1WxE9Ngudg'
+
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
