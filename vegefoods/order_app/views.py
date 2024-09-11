@@ -11,6 +11,9 @@ import random
 import razorpay
 from django.conf import settings
 from django.views.decorators.csrf import csrf_exempt
+from django.core.mail import EmailMessage
+from django.template.loader import render_to_string
+from django.utils.html import strip_tags
 
 # Razorpay client initialization
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -120,6 +123,24 @@ def place_order(request):
             product.save()
 
         cart_items.delete()
+
+        # Send confirmation email
+                # Fetch order items
+        order_items = OrderItem.objects.filter(order=new_order)
+
+        # Define the subject and email content
+        email_subject = 'Order Confirmation'
+        email_body = render_to_string('user/order_email/order_confirmation_email.html', {
+            'user': user,
+            'order': new_order,
+            'order_items': order_items
+        })
+
+        # Send email as HTML
+        email_message = EmailMessage(email_subject, email_body, to=[user.email])
+        email_message.content_subtype = "html"  
+        email_message.send()
+        print("email sends cod")
         return redirect(reverse('order_success'))
 
     return render(request, 'user/checkout.html', {
@@ -184,6 +205,21 @@ def razorpay_payment_status(request):
 
             # Clear the cart after order creation
             cart_items.delete()
+            order_items = OrderItem.objects.filter(order=new_order)
+
+        # Define the subject and email content
+            email_subject = 'Order Confirmation'
+            email_body = render_to_string('user/order_email/order_confirmation_email.html', {
+                'user': user,
+                'order': new_order,
+                'order_items': order_items
+            })
+
+            # Send email as HTML
+            email_message = EmailMessage(email_subject, email_body, to=[user.email])
+            email_message.content_subtype = "html"  
+            email_message.send()
+            print("email sends razor pay")
             return redirect('order_success')
 
         except razorpay.errors.SignatureVerificationError:
