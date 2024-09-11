@@ -1,0 +1,60 @@
+{% extends 'user/base.html' %}
+{% load static %}
+{% block title %}Home - Vegefoods{% endblock %}
+
+{% block content %}
+    <section class="ftco-section bg-light">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="debit-card">
+                        <div class="brand">Vegefoods</div>
+                        <div class="card-number">**** **** **** 1234</div>
+                        <div class="balance">$500.00</div>
+                        <div class="expiry">Valid Thru: 12/26</div>
+                    </div>
+
+                    <form class="mb-4">
+                        <label for="amount">Add Amount</label>
+                        <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter amount">
+                        <button type="submit" class="btn btn-primary mt-3">Add Amount</button>
+                    </form>
+
+                    <table class="table table-bordered transactions-table">
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Amount</th>
+                                <th>Type</th>
+                                <th>Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Repeat this row for each transaction -->
+                            <tr>
+                                <td>1</td>
+                                <td>$200.00</td>
+                                <td>Credit</td>
+                                <td>2024-08-08</td>
+                            </tr>
+                            <tr>
+                                <td>2</td>
+                                <td>$50.00</td>
+                                <td>Debit</td>
+                                <td>2024-08-07</td>
+                            </tr>
+                            <tr>
+                                <td>3</td>
+                                <td>$250.00</td>
+                                <td>Bank Transfer</td>
+                                <td>2024-08-06</td>
+                            </tr>
+                            <!-- End repeat -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    {% endblock %}

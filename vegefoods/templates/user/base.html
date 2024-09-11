@@ -166,6 +166,38 @@
 .bg-danger {
   background: linear-gradient(45deg, #dc3545, #f44336); /* Red gradient */
 }
+.debit-card {
+            background: linear-gradient(135deg, #02aab0 0%, #00cdac 100%);
+            color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .debit-card .brand {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .debit-card .card-number {
+            letter-spacing: 2px;
+            font-size: 20px;
+            margin-top: 20px;
+        }
+        .debit-card .balance {
+            font-size: 30px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        .debit-card .expiry {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            font-size: 16px;
+        }
+        .transactions-table th, .transactions-table td {
+            text-align: center;
+        }
 
     </style>
 
@@ -233,7 +265,7 @@
                     {% if user.is_authenticated %}
                         <a class="dropdown-item" href="{% url 'profile_view' %}">My Profile</a>
                         <a class="dropdown-item" href="{% url 'order_list' %}">Order List</a>
-                        <a class="dropdown-item" href="#">My Wallet</a>
+                        <a class="dropdown-item" href="{% url 'wallet' %}">My Wallet</a>
                         <a class="dropdown-item" href="{% url 'logout' %}">Logout</a>
                     {% else %}
                         <a class="dropdown-item" href="{% url 'login' %}">Login</a>

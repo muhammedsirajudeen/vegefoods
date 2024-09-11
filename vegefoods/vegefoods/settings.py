@@ -59,7 +59,8 @@ INSTALLED_APPS = [
     'cart_app',
     'order_app',
     'wishlist_app',
-    'coupen_app'
+    'coupen_app',
+    'wallet'
 ]
 
 SOCIALACCOUNT_PROVIDERS = {
