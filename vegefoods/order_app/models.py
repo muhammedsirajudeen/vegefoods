@@ -45,7 +45,9 @@ class OrderItem(models.Model):
         ("Out For Delivery", "Out For Delivery"),
         ("Delivered", "Delivered"),
         ("Cancelled", "Cancelled"),
+        ("Requested Return","Requested Return"),
         ("Approve Returned", "Approve Returned"),
+        ("Reject Returned", "Reject Returned"),
 
     ]
     order = models.ForeignKey(Order, related_name='items', on_delete=models.CASCADE)
@@ -54,7 +56,8 @@ class OrderItem(models.Model):
     price = models.DecimalField(max_digits=10, decimal_places=2)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Order Pending') 
     subtotal_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
-
+    return_reason = models.TextField(blank=True, null=True)
+    
     def __str__(self):
         return f'{self.quantity} of {self.product.product_name} in order {self.order.id}'
 

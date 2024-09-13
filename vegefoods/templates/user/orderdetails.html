@@ -34,25 +34,49 @@
     {% elif order_items.status == "Delivered" %}
       <div class="progress-bar bg-success" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Delivered</div>
     {% elif order_items.status == "Cancelled" or order_items.status == "Approve Returned" %}
-      <div class="progress-bar bg-danger" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{ order_items.status }}</div>
+      <div class="progress-bar bg-success" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">{{ order_items.status }}</div>
+      {% elif order_items.status == "Cancelled" or order_items.status == "Reject Returned" %}
+      <div class="progress-bar bg-success" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Delivered</div>
+    {% elif order_items.status == "Requested Return" %}
+      <div class="progress-bar bg-success" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">Delivered</div>
     {% endif %}
   </div>
 </div>
 
                 
-                <!-- prigress bar end -->
-                <div class="order-actions mt-3">
-                  {% if  order_items.status == "Delivered" %}
-                
-                    <form action="" method="POST">
-                      <button type="submit" class="btn btn-secondary">Return Order</button>
-                    </form>
-                    {% elif order_items.status == "Order Pending" or order_items.status == "Order confirmed" or order_items.status == "Shipped" or order_items.status == "Out For Delivery" %}                    <!-- Show Cancel Option before the order is delivered -->
-                    <form action="" method="POST">
-                      <button type="submit" class="btn btn-danger">Cancel Order</button>
-                    </form>
-                  {% endif %}
-                </div>
+<div class="order-actions mt-3">
+  {% if order_items.status == "Order Pending" or order_items.status == "Order confirmed" or order_items.status == "Shipped" or order_items.status == "Out For Delivery" %}
+      <!-- Show Cancel Option only if the order is not yet Delivered -->
+      <form action="{% url 'user_cancel_order_item' order_items.id %}" method="POST">
+          {% csrf_token %}
+          <button type="submit" class="btn btn-danger">Cancel Order</button>
+      </form>
+      {% elif order_items.status == "Requested Return" %}
+      <button type="submit" class="btn" style="background-color: #ff8800; color: white;">Requested for Return</button>
+      {% elif order_items.status == "Reject Returned" %}
+      <button type="submit" class="btn" style="background-color: #db4545; color: white;">Reject Returned</button>
+      
+  {% elif order_items.status == "Delivered" %}
+      <!-- Show Return Option only if Delivered -->
+      <button type="button" class="btn btn-secondary" id="returnOrderButton">
+          Return Order
+      </button>
+      <!-- Return Order Form -->
+      <div id="returnOrderForm" style="display: none;">
+          <h5 class="mt-4">Submit Your Return Request</h5>
+          <form action="{% url 'user_return_order_item' order_items.id %}" method="POST">
+              {% csrf_token %}
+              <div class="form-group">
+                  <label for="returnReason">Reason for Return:</label>
+                  <textarea name="return_reason" id="returnReason" class="form-control" rows="3" placeholder="Write your return reason here..." required></textarea>
+              </div>
+              <button type="submit" class="btn btn-success mt-3">Submit Return Request</button>
+          </form>
+      </div>
+  {% endif %}
+</div>
+
+         
 
                 <h4 class="mt-4">Order Items</h4>
                 <table class="table table-bordered">
@@ -84,7 +108,7 @@
 
 
 <!-- Review Submission Form -->
-{% if  order_items.status == "Delivered" %}
+{% if  order_items.status == "Delivered" or  order_items.status == "Reject Returned"  %}
 <h5 class="mt-4">Submit Your Review</h5>
 <form action="/submit_review" method="POST">
   <div class="form-group">
@@ -110,7 +134,7 @@
 {% endif %}
 
               </div>
-              {% if  order_items.status == "Delivered" %}
+              {% if  order_items.status == "Delivered" or  order_items.status == "Requested Return" or  order_items.status == "Reject Returned" %}
               <div class="col-md-4">
                 <h4 class="mt-4">Invoice</h4>
                 <form method="POST" action="{% url 'download_invoice_item' order_items.id %}">
@@ -129,4 +153,13 @@
       </div>
     </div>
   </section>
+  <script>
+    document.getElementById('returnOrderButton').addEventListener('click', function() {
+        console.log("clicked");
+        
+        var form = document.getElementById('returnOrderForm');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    });
+    </script>
   {% endblock %}
+  <!-- JavaScript to toggle form visibility -->

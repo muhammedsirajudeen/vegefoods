@@ -18,7 +18,7 @@ def admin_login(request):
 
 def panel(request):
     if not request.user.is_authenticated or not request.user.is_superuser: 
-        return redirect('admin_login')  # Use the correct URL name
+        return redirect('admin_login')
     return render(request, 'admin/dashboard.html')  
 
  
