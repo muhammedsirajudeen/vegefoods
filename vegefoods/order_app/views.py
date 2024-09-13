@@ -14,6 +14,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
 from django.utils.html import strip_tags
+from datetime import datetime, timedelta
+from django.utils.timezone import now
 
 # Razorpay client initialization
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -251,8 +253,27 @@ def user_order_list(request):
 def admin_order_list(request):
     if not request.user.is_authenticated or not request.user.is_superuser:
         return redirect('admin_login') 
-    orders = Order.objects.all()
-    return render(request,'admin/order_admin.html',{'order':orders})
+         # Initialize orders to an empty queryset in case no condition matches
+    orders = Order.objects.none()
+
+    filter_option = request.GET.get('filter','all')
+
+    if filter_option == 'daily':
+        today = now().date()
+        orders = Order.objects.filter(created_at__date=today)
+
+    elif filter_option == 'weekly':
+        last_week = now() - timedelta(days=7)
+        orders = Order.objects.filter(created_at__gte=last_week)
+
+    elif filter_option == 'yearly':
+        current_year = now().year
+        orders = Order.objects.filter(created_at__year=current_year)
+    else:
+        orders = Order.objects.all()
+
+
+    return render(request,'admin/order_admin.html',{'order':orders, 'filter_option': filter_option})
 
 
 def admin_order_details(request, order_id):
@@ -392,3 +413,30 @@ def download_invoice_item(request, item_id):
     response['Content-Disposition'] = f'attachment; filename="invoice_item_{order_item.id}.pdf"'
 
     return response
+
+def user_cancel_order_item(request,order_item_id):
+    order_item =  get_object_or_404(OrderItem,id=order_item_id)
+
+    if order_item.status in ["Order Pending", "Order confirmed", "Shipped", "Out For Delivery"]:
+        order_item.status = "Cancelled"
+        order_item.save()
+    else:
+        print("order cannot canncel")
+
+    return redirect('order_details',order_id = order_item.id)
+
+def user_return_order_item(request,order_item_id):
+    order_item =  get_object_or_404(OrderItem,id=order_item_id)
+
+    if order_item.status == 'Delivered':
+        return_reason =  request.POST.get('return_reason','')
+
+        order_item.return_reason =  return_reason
+        order_item.status = 'Requested Return'
+        order_item.save()
+        print("return reson saved")
+
+    else:
+        print("not submimited")
+
+    return redirect('order_list')

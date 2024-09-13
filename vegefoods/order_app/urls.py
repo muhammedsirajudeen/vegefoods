@@ -14,4 +14,7 @@ urlpatterns = [
     path('checkout/order/<int:order_id>/update-status/', views.update_order_status, name='update_order_status'),
     path('download_invoice_item/<int:item_id>/', views.download_invoice_item, name='download_invoice_item'),
     path('razorpay/payment/status/', views.razorpay_payment_status, name='razorpay_payment_status'),
+    path('cancel-order-item/<int:order_item_id>', views.user_cancel_order_item, name='user_cancel_order_item'),
+    path('return-order-request/<int:order_item_id>', views.user_return_order_item, name='user_return_order_item'),
+
     ]
