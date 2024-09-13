@@ -10,15 +10,15 @@
                     <div class="debit-card">
                         <div class="brand">Vegefoods</div>
                         <div class="card-number">**** **** **** 1234</div>
-                        <div class="balance">$500.00</div>
+                        <div class="balance">₹{{wallet.balance}}</div>
                         <div class="expiry">Valid Thru: 12/26</div>
                     </div>
 
-                    <form class="mb-4">
+                    <!-- <form class="mb-4">
                         <label for="amount">Add Amount</label>
                         <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter amount">
                         <button type="submit" class="btn btn-primary mt-3">Add Amount</button>
-                    </form>
+                    </form> -->
 
                     <table class="table table-bordered transactions-table">
                         <thead>
@@ -30,25 +30,15 @@
                             </tr>
                         </thead>
                         <tbody>
+                            {% for wallet_details in wallet_details %}
                             <!-- Repeat this row for each transaction -->
                             <tr>
-                                <td>1</td>
-                                <td>$200.00</td>
-                                <td>Credit</td>
-                                <td>2024-08-08</td>
+                                <td>{{wallet_details.id}}</td>
+                                <td>₹{{wallet_details.amount}}</td>
+                                <td>{{wallet_details.transaction_type}}</td>
+                                <td>{{wallet_details.created_at}}</td>
                             </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>$50.00</td>
-                                <td>Debit</td>
-                                <td>2024-08-07</td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>$250.00</td>
-                                <td>Bank Transfer</td>
-                                <td>2024-08-06</td>
-                            </tr>
+                            {% endfor %}
                             <!-- End repeat -->
                         </tbody>
                     </table>
