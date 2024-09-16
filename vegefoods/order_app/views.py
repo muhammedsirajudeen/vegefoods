@@ -461,7 +461,7 @@ def user_cancel_order_item(request,order_item_id):
         order_item.status = "Cancelled"
         order_item.save()
         try:
-            process_refund(order_item)  # You need to implement this function
+            process_cancel_refund(order_item)  # You need to implement this function
             print("order item canceled and refund process")
         except Exception as e:
             print(f"An error occurred while processing the refund: {e}")
@@ -469,6 +469,26 @@ def user_cancel_order_item(request,order_item_id):
         print("order cannot canncel")
 
     return redirect('order_details',order_id = order_item.id)
+
+def process_cancel_refund(order_item):
+    # Get the user's wallet
+    wallet = get_object_or_404(Wallet, user=order_item.order.user)
+    
+    # Calculate the refund amount
+    refund_amount = order_item.subtotal_price
+
+    # Create a transaction in the WalletTransaction model
+   
+    WalletTransation.objects.create(
+        wallet=wallet,
+        transaction_type='cancellation!',
+        amount=refund_amount,
+        created_at=timezone.now()
+    )
+
+    # Update the wallet balance
+    wallet.balance += refund_amount
+    wallet.save()
 
 def user_return_order_item(request,order_item_id):
     order_item =  get_object_or_404(OrderItem,id=order_item_id)
