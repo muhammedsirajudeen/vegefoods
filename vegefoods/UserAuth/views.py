@@ -14,6 +14,7 @@ from django.http import JsonResponse
 from django.contrib.auth import login
 import re
 from product_apps.models import Product
+from wallet.models import Wallet
 # Create your views here.
 
 
@@ -79,6 +80,8 @@ def user_registration(request):
         user = User.objects.create_user(username=uname, first_name=first_name, last_name=last_name, email=email, password=pass1)
         user.save()
 
+        wallet = Wallet.objects.create(user=user,balance=0.00)
+        wallet.save()
 
         otp = OTP(user=user)
         otp.save()

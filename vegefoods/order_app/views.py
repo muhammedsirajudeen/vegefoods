@@ -16,6 +16,8 @@ from django.template.loader import render_to_string
 from django.utils.html import strip_tags
 from datetime import datetime, timedelta
 from django.utils.timezone import now
+from wallet.models import Wallet,WalletTransation
+from django.utils import timezone
 
 # Razorpay client initialization
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -350,7 +352,7 @@ def add_address_checkout(request):
 
 
 
-def update_order_status(request,order_id):
+def update_order_status(request, order_id):
     order = get_object_or_404(Order, id=order_id)
     
     if request.method == 'POST':
@@ -358,7 +360,11 @@ def update_order_status(request,order_id):
         for item in order.items.all():
             new_status = request.POST.get(f'status_{item.id}')
             print(new_status)
+
             if new_status:
+                # Check if the status is being changed to 'Cancelled' or 'Approve Returned'
+                if item.status not in ['Cancelled', 'Approve Returned'] and new_status in ['Cancelled', 'Approve Returned']:
+                    process_refund(item)
                 item.status = new_status
                 item.save()
         
@@ -367,6 +373,41 @@ def update_order_status(request,order_id):
     # If GET request, redirect to order details or some other page
     return redirect('admin_order_details', order_id=order_id)
 
+def user_cancel_order_item(request,order_item_id):
+    order_item =  get_object_or_404(OrderItem,id=order_item_id)
+
+    if order_item.status in ["Order Pending", "Order confirmed", "Shipped", "Out For Delivery"]:
+        order_item.status = "Cancelled"
+        order_item.save()
+        try:
+            process_refund(order_item)  # You need to implement this function
+            print("order item canceled and refund process")
+        except Exception as e:
+            print(f"An error occurred while processing the refund: {e}")
+    else:
+        print("order cannot canncel")
+
+    return redirect('order_details',order_id = order_item.id)
+
+def process_refund(order_item):
+    # Get the user's wallet
+    wallet = get_object_or_404(Wallet, user=order_item.order.user)
+    
+    # Calculate the refund amount
+    refund_amount = order_item.subtotal_price
+
+    # Create a transaction in the WalletTransaction model
+   
+    WalletTransation.objects.create(
+        wallet=wallet,
+        transaction_type='refund',
+        amount=refund_amount,
+        created_at=timezone.now()
+    )
+
+    # Update the wallet balance
+    wallet.balance += refund_amount
+    wallet.save()
 
 def user_order_details(request,order_id):
     order_items = get_object_or_404(OrderItem, id=order_id)
@@ -413,17 +454,41 @@ def download_invoice_item(request, item_id):
     response['Content-Disposition'] = f'attachment; filename="invoice_item_{order_item.id}.pdf"'
 
     return response
-
 def user_cancel_order_item(request,order_item_id):
     order_item =  get_object_or_404(OrderItem,id=order_item_id)
 
     if order_item.status in ["Order Pending", "Order confirmed", "Shipped", "Out For Delivery"]:
         order_item.status = "Cancelled"
         order_item.save()
+        try:
+            process_cancel_refund(order_item)  # You need to implement this function
+            print("order item canceled and refund process")
+        except Exception as e:
+            print(f"An error occurred while processing the refund: {e}")
     else:
         print("order cannot canncel")
 
     return redirect('order_details',order_id = order_item.id)
+
+def process_cancel_refund(order_item):
+    # Get the user's wallet
+    wallet = get_object_or_404(Wallet, user=order_item.order.user)
+    
+    # Calculate the refund amount
+    refund_amount = order_item.subtotal_price
+
+    # Create a transaction in the WalletTransaction model
+   
+    WalletTransation.objects.create(
+        wallet=wallet,
+        transaction_type='cancellation!',
+        amount=refund_amount,
+        created_at=timezone.now()
+    )
+
+    # Update the wallet balance
+    wallet.balance += refund_amount
+    wallet.save()
 
 def user_return_order_item(request,order_item_id):
     order_item =  get_object_or_404(OrderItem,id=order_item_id)
