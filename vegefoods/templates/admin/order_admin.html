@@ -45,22 +45,61 @@
                   <div class="card-body">
                     <div class="d-flex justify-content-between align-items-center">
                       <h4 class="card-title">Order Details</h4>
-            
-                      <!-- Filter Dropdown -->
-                     <!-- Filter Dropdown -->
-<div class="dropdown">
-  <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-    <i class="mdi mdi-filter"></i> Filter
-  </button>
-  <ul class="dropdown-menu" aria-labelledby="filterDropdown">
-    <li><a class="dropdown-item" href="?filter=daily">Today</a></li>
-    <li><a class="dropdown-item" href="?filter=weekly">Weekly</a></li>
-    <li><a class="dropdown-item" href="?filter=yearly">Yearly</a></li>
-    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#customDateModal">Custom Date</a></li>
-  </ul>
-</div>
-
-                    </div>
+                    
+                      <div class="d-flex align-items-center">
+                          <!-- Report Download Buttons -->
+                          <div class="btn-group" role="group">
+                              <a href="{% url 'download_pdf_report' %}?filter={{ filter_option }}" class="btn btn-outline-primary">
+                                  <i class="mdi mdi-file-pdf"></i> Download PDF
+                              </a>
+                              <a href="{% url 'download_excel_report' %}?filter={{ filter_option }}" class="btn btn-outline-success">
+                                  <i class="mdi mdi-file-excel"></i> Download Excel
+                              </a>
+                          </div>
+                  
+                          <!-- Filter Dropdown -->
+                          <div class="dropdown me-2">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                                <i class="mdi mdi-filter"></i> Filter
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                                <li><a class="dropdown-item" href="?filter=daily">Today</a></li>
+                                <li><a class="dropdown-item" href="?filter=weekly">Weekly</a></li>
+                                <li><a class="dropdown-item" href="?filter=yearly">Yearly</a></li>
+                                <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#customDateModal">Custom Date</a></li>
+                            </ul>
+                        </div>
+                        
+                        <!-- Custom Date Filter Modal -->
+                        <div class="modal fade" id="customDateModal" tabindex="-1" aria-labelledby="customDateModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <form method="GET" action="">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title" id="customDateModalLabel">Custom Date Filter</h5>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div>
+                                        <div class="modal-body">
+                                            <div class="mb-3">
+                                                <label for="startDate" class="form-label">Start Date</label>
+                                                <input type="date" class="form-control" id="startDate" name="start_date" required>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="endDate" class="form-label">End Date</label>
+                                                <input type="date" class="form-control" id="endDate" name="end_date" required>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="submit" class="btn btn-primary">Apply Filter</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        
+                      </div>
+                  </div>
+                  
                     <div class="table-responsive">
                       <table class="table">
                         <thead>

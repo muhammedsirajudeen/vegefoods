@@ -18,6 +18,10 @@ from datetime import datetime, timedelta
 from django.utils.timezone import now
 from wallet.models import Wallet,WalletTransation
 from django.utils import timezone
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+from io import BytesIO
+import csv
 
 # Razorpay client initialization
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -259,6 +263,8 @@ def admin_order_list(request):
     orders = Order.objects.none()
 
     filter_option = request.GET.get('filter','all')
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
 
     if filter_option == 'daily':
         today = now().date()
@@ -271,6 +277,12 @@ def admin_order_list(request):
     elif filter_option == 'yearly':
         current_year = now().year
         orders = Order.objects.filter(created_at__year=current_year)
+    elif start_date and end_date:
+        try:
+            orders = Order.objects.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+        except ValueError:
+            # Handle incorrect date input if needed
+            pass
     else:
         orders = Order.objects.all()
 
@@ -505,3 +517,88 @@ def user_return_order_item(request,order_item_id):
         print("not submimited")
 
     return redirect('order_list')
+
+
+
+def download_pdf_report(request):
+    # Fetch filtered orders
+    orders = _get_filtered_orders(request)
+
+    # Create a PDF response
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="orders_report.pdf"'
+
+    buffer = BytesIO()
+    pdf = canvas.Canvas(buffer, pagesize=letter)
+    pdf.drawString(100, 750, "Order Report")
+
+    # Add table headers
+    pdf.drawString(100, 730, "Order ID")
+    pdf.drawString(200, 730, "Order Number")
+    pdf.drawString(300, 730, "Customer Name")
+    pdf.drawString(450, 730, "Order Date")
+
+    y = 710
+    for order in orders:
+        pdf.drawString(100, y, str(order.id))
+        pdf.drawString(200, y, str(order.order_number))
+        pdf.drawString(300, y, order.address.name)
+        pdf.drawString(450, y, order.created_at.strftime("%Y-%m-%d"))
+        y -= 20
+
+    pdf.showPage()
+    pdf.save()
+
+    pdf_data = buffer.getvalue()
+    buffer.close()
+    response.write(pdf_data)
+
+    return response
+
+
+
+def download_excel_report(request):
+    # Fetch filtered orders
+    orders = _get_filtered_orders(request)
+
+    # Create a CSV response
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="orders_report.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Order ID', 'Order Number', 'Customer Name', 'Order Date'])
+
+    for order in orders:
+        writer.writerow([order.id, order.order_number, order.address.name, order.created_at.strftime("%Y-%m-%d")])
+
+    return response
+
+
+def _get_filtered_orders(request):
+    filter_option = request.GET.get('filter', 'all')
+    start_date = request.GET.get('start_date', None)
+    end_date = request.GET.get('end_date', None)
+    
+    # Handle filter options
+    if filter_option == 'daily':
+        today = now().date()
+        return Order.objects.filter(created_at__date=today)
+    elif filter_option == 'weekly':
+        last_week = now() - timedelta(days=7)
+        return Order.objects.filter(created_at__gte=last_week)
+    elif filter_option == 'yearly':
+        current_year = now().year
+        return Order.objects.filter(created_at__year=current_year)
+        # If custom dates are provided, use them regardless of other filters
+    elif start_date and end_date:
+        try:
+            # Convert start_date and end_date to datetime objects
+            start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
+            print(start_date,end_date)
+            return Order.objects.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
+        except ValueError:
+            # Return empty queryset if date conversion fails
+            return Order.objects.none()
+    else:
+        return Order.objects.all()
