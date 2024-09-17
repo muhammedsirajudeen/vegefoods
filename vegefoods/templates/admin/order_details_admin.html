@@ -177,6 +177,12 @@
               
                 <strong class="twinkle-text">{{ item.return_reason }}</strong>
             </td>
+            {% else %}
+            <td>
+                <!-- Red circle with twinkling effect -->
+              
+                <strong class="twinkle-text"></strong>
+            </td>
         {% endif %}
         
             <td>₹{{ item.subtotal_price }}</td>
