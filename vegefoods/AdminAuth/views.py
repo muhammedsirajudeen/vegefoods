@@ -58,6 +58,8 @@ def panel(request):
         total_revenue=Sum('subtotal_price'),
     ).order_by('-total_quantity_sold')[:10]
 
+    
+
     context={
         'total_sales':total_sales,
         'sales_count':sales_count,
