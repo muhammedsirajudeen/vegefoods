@@ -284,7 +284,7 @@ def admin_order_list(request):
             # Handle incorrect date input if needed
             pass
     else:
-        orders = Order.objects.all()
+        orders = Order.objects.all().order_by('-created_at')
 
 
     return render(request,'admin/order_admin.html',{'order':orders, 'filter_option': filter_option})

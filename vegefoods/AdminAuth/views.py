@@ -1,7 +1,7 @@
 from django.shortcuts import render,redirect,get_object_or_404
 from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
-from django.db.models import Sum,Count
+from django.db.models import Sum,Count,Q
 from order_app.models import Order,OrderItem
 
 def admin_login(request):
@@ -49,15 +49,22 @@ def panel(request):
         .filter(total_orders__gt=0) 
         .order_by('-total_spend')[:10]
     )
-    for i in top_products:
-        print("top products",i)
+    
+    top_category = OrderItem.objects.values(
+        'product__category__category_name',
+        'product__category__category_unit',
+    ).annotate(
+        total_quantity_sold = Sum('quantity'),
+        total_revenue=Sum('subtotal_price'),
+    ).order_by('-total_quantity_sold')[:10]
 
     context={
         'total_sales':total_sales,
         'sales_count':sales_count,
         'top_products':top_products,
         'orders_by_pincode': orders_by_pincode,
-        'top_customers':top_customers
+        'top_customers':top_customers,
+        'top_category':top_category, 
     }
     return render(request, 'admin/dashboard.html',context)  
 
@@ -88,3 +95,42 @@ def admin_logout(request):
     logout(request)
     return redirect('admin_login')
 
+def ledger_book_view(request):
+    # Fetch all orders along with their associated items
+    total_sales_price = Order.objects.aggregate(Sum('total_price'))['total_price__sum'] or 0
+    total_sales_delivered = OrderItem.objects.filter(status='Delivered').aggregate(
+        total=Sum('subtotal_price'))['total'] or 0
+
+    total_refunds = OrderItem.objects.filter(
+    Q(status='Cancelled') | Q(status='Approve Returned')
+    ).aggregate(refunded_amount=Sum('subtotal_price'))['refunded_amount'] or 0
+
+    total_orders = Order.objects.count()
+    total_orders_delivered = Order.objects.filter(items__status='Delivered').count()
+
+    total_canceled_items =OrderItem.objects.filter(status='Cancelled').count()
+    total_returned_items = OrderItem.objects.filter(status='Approve Returned').count()
+    
+    total_products_ordered =  OrderItem.objects.values('product').count()
+
+    total_products_in_progress = OrderItem.objects.filter(
+        Q(status='Order Pending') | 
+        Q(status='Order confirmed') | 
+        Q(status='Shipped') | 
+        Q(status='Out For Delivery')
+    ).count()
+
+    context = {
+        'total_sales_price': total_sales_price,
+        'total_sales_delivered':total_sales_delivered,
+        'total_refunds':total_refunds,
+        'total_orders':total_orders,
+        'total_orders_delivered':total_orders_delivered,
+        'total_canceled_items':total_canceled_items,
+        'total_returned_items':total_returned_items,
+        'total_products_ordered':total_products_ordered,
+        'total_products_in_progress': total_products_in_progress
+
+    }
+    
+    return render(request, 'admin/ledger_book.html', context)

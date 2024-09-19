@@ -28,7 +28,7 @@ def product_list(request):
         form = ProductForm()
         errors = None
 
-    products_list = Product.objects.all()
+    products_list = Product.objects.all().order_by('available_stock')
     paginator = Paginator(products_list, 10)  # Show 10 products per page
     page_number = request.GET.get('page')
     products = paginator.get_page(page_number)
