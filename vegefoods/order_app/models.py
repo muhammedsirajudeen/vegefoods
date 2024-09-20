@@ -5,6 +5,10 @@ from address_app.models import Address
 import uuid
 from django.utils import timezone 
 from datetime import timedelta 
+from django.http import JsonResponse
+from django.utils.dateparse import parse_date
+from datetime import datetime
+from django.db.models import Count
 
 class Order(models.Model):
     PAYMENT_CHOICES = [
@@ -71,3 +75,18 @@ class Invoice(models.Model):
     def __str__(self):
         return self.invoice_number
 
+
+def get_monthly_orders(request, year):
+    orders = Order.objects.filter(created_at__year=year).annotate(
+        month=ExtractMonth('created_at')
+    ).values('month').annotate(count=Count('id')).order_by('month')
+
+    # Ensure all months are included
+    monthly_data = [0] * 12
+    for order in orders:
+        monthly_data[order['month'] - 1] = order['count']
+
+    return JsonResponse({
+        'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        'data': monthly_data
+    })

@@ -30,9 +30,9 @@
             {% include 'admin/navbar.html' %}
             <div class="main-panel">
                 <div class="content-wrapper">
+                    
                     <!-- Revenue and Sales Metrics -->
                     <div class="row">
-                        
                         <div class="col-sm-4 grid-margin">
                             <div class="card">
                                 <div class="card-body">
@@ -54,6 +54,8 @@
                             </div>
                         </div>
                     </div> 
+    
+                    <!-- Top-Selling Categories -->
                     <div class="row">
                         <div class="col-12 grid-margin">
                             <div class="card">
@@ -89,8 +91,7 @@
                             </div>
                         </div>
                     </div>
-                    
-                    
+    
                     <!-- Top-Selling Products -->
                     <div class="row">
                         <div class="col-12 grid-margin">
@@ -140,43 +141,45 @@
                             </div>
                         </div>
                     </div>
-                    
+    
+                    <!-- Top Customers -->
                     <div class="row">
                         <div class="col-12 grid-margin">
-                          <div class="card">
-                            <div class="card-body">
-                              <h4 class="card-title">Top Customers</h4>
-                              <div class="table-responsive">
-                                <table class="table">
-                                  <thead>
-                                    <tr>
-                                      <th>Customer Name</th>
-                                      <th>Total Orders</th>
-                                      <th>Total Spend</th>
-                                    </tr>
-                                  </thead>
-                                  <tbody>
-                                    {% for customer in top_customers %}
-                                    <tr>
-                                      <td>{{ customer.username }}</td> <!-- Use username or other User fields -->
-                                      <td>{{ customer.total_orders }}</td>
-                                      <td>₹{{ customer.total_spend }}</td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                      <td colspan="3" class="text-center">No top customers available.</td>
-                                    </tr>
-                                    {% endfor %}
-                                  </tbody>
-                                </table>
-                              </div>
+                            <div class="card">
+                                <div class="card-body">
+                                    <h4 class="card-title">Top Customers</h4>
+                                    <div class="table-responsive">
+                                        <table class="table">
+                                            <thead>
+                                                <tr>
+                                                    <th>Customer Name</th>
+                                                    <th>Total Orders</th>
+                                                    <th>Total Spend</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                {% for customer in top_customers %}
+                                                <tr>
+                                                    <td>{{ customer.username }}</td>
+                                                    <td>{{ customer.total_orders }}</td>
+                                                    <td>₹{{ customer.total_spend }}</td>
+                                                </tr>
+                                                {% empty %}
+                                                <tr>
+                                                    <td colspan="3" class="text-center">No top customers available.</td>
+                                                </tr>
+                                                {% endfor %}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
                             </div>
-                          </div>
                         </div>
-                      </div>
+                    </div>
+    
                     <!-- Orders by Pincode -->
                     <div class="row">
-                        <div class="col-12">
+                        <div class="col-12 grid-margin">
                             <div class="card">
                                 <div class="card-body">
                                     <h4 class="card-title">Most Ordered PIN Codes</h4>
@@ -210,39 +213,61 @@
                             </div>
                         </div>
                     </div>
-                   
-                    <div class="col-lg-6 grid-margin stretch-card">
-                        <div class="card">
-                            <div class="card-body d-flex justify-content-between align-items-center">
-                                <h4 class="card-title mb-0">Monthly Orders for 2024</h4>
-                                <select class="form-select" id="yearFilter" style="max-width: 150px;">
-                                    <option value="2024" selected>2024</option>
-                                    <option value="2023">2023</option>
-                                    <option value="2022">2022</option>
-                                    <!-- Add more years as needed -->
-                                </select>
+    
+                    <!-- Monthly Orders for 2024 -->
+                    <div class="row">
+                        <div class="col-lg-6 grid-margin stretch-card">
+                            <div class="card" style="height: 300px;">
+                                <div class="card-body d-flex justify-content-between align-items-center">
+                                    <h4 class="card-title mb-0">Monthly Orders for 2024</h4>
+                                    <select class="form-select" id="yearFilter" style="max-width: 150px;">
+                                        <option value="2024" selected>2024</option>
+                                        <option value="2023">2023</option>
+                                        <option value="2022">2022</option>
+                                        <!-- Add more years as needed -->
+                                    </select>
+                                </div>
+                                <div class="chart-container" style="position: relative; height: 250px;">
+                                    <canvas id="barChart" style="height: 250px; width: 100%;"></canvas>
+                                    <div id="noDataBar" class="no-data-message" style="display: none; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                        <h6>No data available for this year.</h6>
+                                    </div>
+                                </div>
                             </div>
-                            <canvas id="barChart" style="height:230px"></canvas>
                         </div>
-</div>
-
-
+                    
+                        <!-- Top-Selling Categories Pie Chart -->
+                        <div class="col-lg-6 grid-margin stretch-card">
+                            <div class="card" style="height: 300px;">
+                                <div class="card-body d-flex justify-content-center align-items-center flex-column">
+                                    <h4 class="card-title mb-3">Top-Selling Categories</h4>
+                                    <canvas id="pieChart" style="height: 250px; width: 100%;"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
                 </div>
-               
                 <!-- content-wrapper ends -->
-                <!-- partial:partials/_footer.html -->
+    
+                <!-- Footer -->
                 <footer class="footer">
                     <div class="d-sm-flex justify-content-center justify-content-sm-between">
-                        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">Copyright © bootstrapdash.com 2020</span>
-                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center"> Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com</span>
+                        <span class="text-muted d-block text-center text-sm-left d-sm-inline-block">
+                            Copyright © bootstrapdash.com 2020
+                        </span>
+                        <span class="float-none float-sm-right d-block mt-1 mt-sm-0 text-center">
+                            Free <a href="https://www.bootstrapdash.com/bootstrap-admin-template/" target="_blank">Bootstrap admin templates</a> from Bootstrapdash.com
+                        </span>
                     </div>
                 </footer>
-                <!-- partial -->
+                <!-- Footer ends -->
             </div>
             <!-- main-panel ends -->
         </div>
         <!-- page-body-wrapper ends -->
     </div>
+    
     <!-- container-scroller -->
     <!-- plugins:js -->
     <script src="{% static 'admin/vendors/js/vendor.bundle.base.js' %}"></script>
@@ -265,36 +290,99 @@
     <script src="{% static 'admin/js/dashboard.js' %}"></script>
     <!-- End custom js for this page -->
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var ctx = document.getElementById('barChart').getContext('2d');
-            var chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: {{ monthly_labels|safe }},
-                    datasets: [{
-                        label: 'Monthly Orders',
-                        data: {{ monthly_values|safe }},
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Chart.js Configuration -->
+<script>
+    // Bar chart for monthly orders
+    const ctx = document.getElementById('barChart').getContext('2d');
+    let barChart;
+
+    function updateChart(year) {
+        fetch(`/admin/panel/year/${year}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (barChart) {
+                    barChart.destroy();
+                }
+
+                if (data.data.length === 0) {
+                    document.getElementById('noDataBar').style.display = 'block';
+                    return; // Exit if no data
+                } else {
+                    document.getElementById('noDataBar').style.display = 'none';
+                }
+
+                barChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Orders',
+                            data: data.data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
+                });
             });
+    }
 
-            // Update chart data on year selection change
-            document.getElementById('yearFilter').addEventListener('change', function() {
-                var year = this.value;
-                window.location.href = '?year=' + year;
-            });
-        });
-    </script>
+    // Initialize chart with default year
+    updateChart('2024');
+
+    // Year filter change event
+    document.getElementById('yearFilter').addEventListener('change', function(event) {
+        updateChart(event.target.value);
+    });
+
+    // Pie chart for top-selling categories
+    const ctxPie = document.getElementById('pieChart').getContext('2d');
+    
+    const categoryPieChart = new Chart(ctxPie, {
+        type: 'pie',
+        data: {
+            labels: {{ categories|safe }},  // Expecting categories as a list in the context
+            datasets: [{
+                label: 'Top-Selling Categories',
+                data: {{ quantities|safe }},  // Expecting quantities as a list in the context
+                backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+</script>
+
+
 </body>
 </html>
