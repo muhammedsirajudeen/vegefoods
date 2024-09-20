@@ -25,5 +25,6 @@ urlpatterns = [
     path('user_management/',views.user_managment, name='user_management'),
     path('user/<int:user_id>/block-unblock/',views.block_unblock_user,name='block_unblock_user'),
     path('ledger_book/',views.ledger_book_view,name='ledger_book_view'),
+    path('panel/year/<int:year>/', views.get_monthly_orders, name='monthly_orders'),
     path('logout',views.logout,name='logout'),
 ]

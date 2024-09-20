@@ -136,3 +136,21 @@ def ledger_book_view(request):
     }
     
     return render(request, 'admin/ledger_book.html', context)
+
+
+
+def get_monthly_orders(request, year):
+    # Query to count orders by month
+    orders = Order.objects.filter(created_at__year=year).annotate(
+        month=ExtractMonth('created_at')
+    ).values('month').annotate(count=Count('id')).order_by('month')
+    print("order is ")
+    # Prepare data for each month
+    monthly_data = [0] * 12
+    for order in orders:
+        monthly_data[order['month'] - 1] = order['count']
+
+    return JsonResponse({
+        'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
+        'data': monthly_data
+    })

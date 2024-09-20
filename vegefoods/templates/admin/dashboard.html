@@ -224,8 +224,8 @@
                             </div>
                             <canvas id="barChart" style="height:230px"></canvas>
                         </div>
-</div>
-
+                    </div>
+                    
 
                 </div>
                
@@ -265,36 +265,54 @@
     <script src="{% static 'admin/js/dashboard.js' %}"></script>
     <!-- End custom js for this page -->
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var ctx = document.getElementById('barChart').getContext('2d');
-            var chart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: {{ monthly_labels|safe }},
-                    datasets: [{
-                        label: 'Monthly Orders',
-                        data: {{ monthly_values|safe }},
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- Chart.js Configuration -->
+<script>
+    const ctx = document.getElementById('barChart').getContext('2d');
+    let barChart;
+
+    function updateChart(year) {
+        fetch(`/admin/panel/year/${year}/`)
+            .then(response => response.json())
+            .then(data => {
+                if (barChart) {
+                    barChart.destroy();
+                }
+
+                barChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [{
+                            label: 'Orders',
+                            data: data.data,
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                beginAtZero: true
+                            },
+                            y: {
+                                beginAtZero: true
+                            }
                         }
                     }
-                }
+                });
             });
+    }
 
-            // Update chart data on year selection change
-            document.getElementById('yearFilter').addEventListener('change', function() {
-                var year = this.value;
-                window.location.href = '?year=' + year;
-            });
-        });
-    </script>
+    // Initialize chart with default year
+    updateChart('2024');
+
+    document.getElementById('yearFilter').addEventListener('change', function(event) {
+        updateChart(event.target.value);
+    });
+</script>
 </body>
 </html>
