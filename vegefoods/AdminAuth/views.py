@@ -3,6 +3,10 @@ from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.models import User
 from django.db.models import Sum,Count,Q
 from order_app.models import Order,OrderItem
+from category_app.models import Category
+from django.db.models.functions import ExtractMonth
+from django.http import JsonResponse
+
 
 def admin_login(request):
     if request.user.is_authenticated and request.user.is_staff:
@@ -58,7 +62,12 @@ def panel(request):
         total_revenue=Sum('subtotal_price'),
     ).order_by('-total_quantity_sold')[:10]
 
+    top_categories = OrderItem.objects.values('product__category__category_name').annotate(
+        total_quantity_sold=Sum('quantity')
+    ).order_by('-total_quantity_sold')[:5]  # Limit to top 5 categories
     
+    categories = [category['product__category__category_name'] for category in top_categories]
+    quantities = [category['total_quantity_sold'] for category in top_categories]
 
     context={
         'total_sales':total_sales,
@@ -67,6 +76,8 @@ def panel(request):
         'orders_by_pincode': orders_by_pincode,
         'top_customers':top_customers,
         'top_category':top_category, 
+        'categories': categories,
+        'quantities': quantities,
     }
     return render(request, 'admin/dashboard.html',context)  
 
@@ -144,7 +155,7 @@ def get_monthly_orders(request, year):
     orders = Order.objects.filter(created_at__year=year).annotate(
         month=ExtractMonth('created_at')
     ).values('month').annotate(count=Count('id')).order_by('month')
-    print("order is ")
+    
     # Prepare data for each month
     monthly_data = [0] * 12
     for order in orders:
@@ -154,3 +165,4 @@ def get_monthly_orders(request, year):
         'labels': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
         'data': monthly_data
     })
+
