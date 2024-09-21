@@ -18,5 +18,6 @@ urlpatterns = [
     path('return-order-request/<int:order_item_id>', views.user_return_order_item, name='user_return_order_item'),
     path('admin/orders/download-pdf/', views.download_pdf_report, name='download_pdf_report'),
     path('admin/orders/download-excel/', views.download_excel_report, name='download_excel_report'),
-
+    path('retry_payment/<int:order_id>/', views.retry_payment, name='retry_payment'),
+    path('handle_payment/', views.handle_payment, name='handle_payment'),  # This should match with your form action
     ]

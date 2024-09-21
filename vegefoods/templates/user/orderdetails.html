@@ -45,6 +45,7 @@
 
                 
 <div class="order-actions mt-3">
+  {% if order.payment_status != "Failure" %}
   {% if order_items.status == "Order Pending" or order_items.status == "Order confirmed" or order_items.status == "Shipped" or order_items.status == "Out For Delivery" %}
       <!-- Show Cancel Option only if the order is not yet Delivered -->
       <form action="{% url 'user_cancel_order_item' order_items.id %}" method="POST">
@@ -74,6 +75,13 @@
           </form>
       </div>
   {% endif %}
+  {% endif %}
+  {% if order.payment_status == 'Failure' %}
+  <form action="{% url 'retry_payment' order.id %}" method="GET">
+    <button type="submit" class="btn btn-success mt-3">Retry Payment</button>
+  </form>
+  {% endif %}
+  
 </div>
 
          

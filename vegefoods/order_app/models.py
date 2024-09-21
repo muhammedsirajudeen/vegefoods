@@ -16,12 +16,18 @@ class Order(models.Model):
         ('RazorPay', 'Razor Pay'),
         ('UPI', 'UPI')
     ]
-   
+    
+    PAYMENT_STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Success', 'Success'),
+        ('Failure', 'Failure')
+    ]
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     address = models.ForeignKey(Address, on_delete=models.CASCADE)
     order_number = models.CharField(max_length=20, unique=True, editable=False)
     total_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
     payment_type = models.CharField(max_length=20, choices=PAYMENT_CHOICES)
+    payment_status = models.CharField(max_length=10, choices=PAYMENT_STATUS_CHOICES, default='Pending')
     estimated_delivery_date = models.DateField(blank=True, null=True)
     coupon_code = models.CharField(max_length=50, blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
