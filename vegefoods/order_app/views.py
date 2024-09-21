@@ -10,6 +10,8 @@ from weasyprint import HTML
 import random
 import razorpay
 from django.conf import settings
+from django.http import JsonResponse
+
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -126,9 +128,12 @@ def place_order(request):
                 price=item.product.price,
                 subtotal_price=item_price
             )
-            product = item.product
-            product.available_stock -= item.quantity
-            product.save()
+
+            if payment_status == 'Success':
+                item.product.available_stock -= item.quantity
+                item.product.save()
+
+
 
         cart_items.delete()
 
@@ -168,6 +173,16 @@ def razorpay_payment_status(request):
         razorpay_order_id = request.POST.get("razorpay_order_id")
         razorpay_signature = request.POST.get("razorpay_signature")
 
+        user = request.user
+        cart = Cart.objects.get(user=user)
+        cart_items = CartItem.objects.filter(cart=cart)
+        selected_address_id = request.session.get('selected_address')
+        selected_address = Address.objects.get(id=selected_address_id)
+
+        total_price = sum([Decimal(item.product.price) * Decimal(item.quantity) for item in cart_items])
+
+        payment_status = 'Failure'  # Default to failure
+
         try:
             # Verify the Razorpay payment signature
             razorpay_client.utility.verify_payment_signature({
@@ -175,47 +190,59 @@ def razorpay_payment_status(request):
                 'razorpay_payment_id': payment_id,
                 'razorpay_signature': razorpay_signature
             })
+            payment_status = 'Success'  # Update to success if verification passes
 
-            # Payment is successful, proceed with creating the order
-            user = request.user
-            cart = Cart.objects.get(user=user)
-            cart_items = CartItem.objects.filter(cart=cart)
-            selected_address_id = request.session.get('selected_address')
-            selected_address = Address.objects.get(id=selected_address_id)
+        except razorpay.errors.SignatureVerificationError:
+            # Payment verification failed
+            pass  # Leave payment_status as 'Failure'
 
-            # Create the order
-            new_order = Order.objects.create(
-                user=user,
-                address=selected_address,
-                payment_type='Razor pay',
-                total_price=sum([Decimal(item.product.price) * Decimal(item.quantity) for item in cart_items])
+        # Create the order regardless of payment status
+        new_order = Order.objects.create(
+            user=user,
+            address=selected_address,
+            payment_type='Razor Pay',
+            total_price=total_price,
+            payment_status=payment_status  # Use the determined payment status
+        )
+
+        # Create order items and reduce stock
+        for item in cart_items:
+            quantity = Decimal(item.quantity)
+            if item.product.category.category_unit == 'kg':
+                item_price = Decimal(item.product.price) * quantity
+            elif item.product.category.category_unit == 'pack':
+                item_price = Decimal(item.product.price) * quantity
+            else:
+                item_price = Decimal(item.product.price) * quantity
+
+
+            OrderItem.objects.create(
+                order=new_order,
+                product=item.product,
+                quantity=item.quantity,
+                price=item.product.price,
+                subtotal_price=item_price
             )
-
-            # Create order items and reduce stock
+        
+        # Adjust stock only for successful payments
+        if payment_status == 'Success':
             for item in cart_items:
-                quantity = Decimal(item.quantity)
-                if item.product.category.category_unit == 'kg':
-                    item_price = Decimal(item.product.price) * quantity
-                elif item.product.category.category_unit == 'pack':
-                    item_price = Decimal(item.product.price) * quantity
-                else:
-                    item_price = Decimal(item.product.price) * quantity
+                item.product.available_stock -= item.quantity
+                item.product.save()
+                
+        # Clear the cart
+        cart_items.delete()
 
-                OrderItem.objects.create(
-                    order=new_order,
-                    product=item.product,
-                    quantity=item.quantity,
-                    price=item.product.price,
-                    subtotal_price=item_price
-                )
+        # Adjust stock only for successful payments
+        if payment_status == 'Success':
+            for item in cart_items:
                 item.product.available_stock -= item.quantity
                 item.product.save()
 
-            # Clear the cart after order creation
-            cart_items.delete()
+        # Send confirmation email only for successful payments
+        if payment_status == 'Success':
             order_items = OrderItem.objects.filter(order=new_order)
 
-        # Define the subject and email content
             email_subject = 'Order Confirmation'
             email_body = render_to_string('user/order_email/order_confirmation_email.html', {
                 'user': user,
@@ -223,20 +250,22 @@ def razorpay_payment_status(request):
                 'order_items': order_items
             })
 
-            # Send email as HTML
             email_message = EmailMessage(email_subject, email_body, to=[user.email])
-            email_message.content_subtype = "html"  
+            email_message.content_subtype = "html"
             email_message.send()
-            print("email sends razor pay")
-            return redirect('order_success')
 
-        except razorpay.errors.SignatureVerificationError:
-            # Handle verification failure
+            return redirect('order_success')
+        else:
+            # Payment failed; redirect or show an appropriate message
             return render(request, 'user/order_confirm.html', {
-                'error_message': 'Payment verification failed. Please try again.'
+                'error_message': 'Payment failed. Your order has been placed but payment was not completed.'
             })
 
-    return redirect('order_success')
+    return render(request, 'user/order_confirm.html', {
+        'error_message': 'Invalid request.'
+    })
+
+
 @login_required
 def order_success(request):
     return render(request,'user/order_confirm.html')
@@ -602,3 +631,63 @@ def _get_filtered_orders(request):
             return Order.objects.none()
     else:
         return Order.objects.all()
+
+
+def retry_payment(request, order_id):
+    order = get_object_or_404(Order, id=order_id)
+    
+    # Create a Razorpay order
+    razorpay_order = razorpay_client.order.create({
+        "amount": int(order.total_price * 100),  # Amount in paise (multiply by 100)
+        "currency": "INR",
+        "payment_capture": "1"  # Auto-capture after payment
+    })
+    print(razorpay_order)
+    # Pass order details and Razorpay order to the template
+    context = {
+        "order": order,
+        "razorpay_order_id": razorpay_order['id'],
+        "razorpay_key": settings.RAZORPAY_KEY_ID,  # Public Key
+        "amount": order.total_price * 100,  # Amount in paise
+    }
+    
+    return render(request, 'user/razorpay/retry_payment.html', context)
+    
+@csrf_exempt
+def handle_payment(request):
+    if request.method == "POST":
+        payment_id = request.POST.get('razorpay_payment_id')
+        order_number = request.POST.get('razorpay_order_id')  # Ensure this is the Razorpay order number
+        signature = request.POST.get('razorpay_signature')
+        db_order_id=request.POST.get('order_id')
+        print("ivduthe",db_order_id)
+
+        try:
+            # Verify the payment signature
+            razorpay_client.utility.verify_payment_signature({
+                'razorpay_order_id': order_number,
+                'razorpay_payment_id': payment_id,
+                'razorpay_signature': signature
+            })
+
+            # Retrieve the order using the order_number
+            order = get_object_or_404(Order, id=db_order_id)  # Use order_number
+            order.payment_status = 'Success'
+            order.payment_type = 'RazorPay'
+            order.save()
+
+            # Deduct stock from the database for the purchased items
+            if order.payment_status == 'Success':
+                for item in order.items.all():
+                    item.product.available_stock -= item.quantity
+                    item.product.save()
+
+            # Redirect the user to the order list page after successful payment
+            return redirect('order_list')
+
+        except razorpay.errors.SignatureVerificationError:
+            return JsonResponse({'status': 'Payment verification failed'})
+        except Exception as e:
+            print("Error:", e)  # Log any unexpected errors
+
+    return JsonResponse({'status': 'Invalid request'})
