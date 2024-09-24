@@ -14,7 +14,7 @@ class Order(models.Model):
     PAYMENT_CHOICES = [
         ('COD', 'Cash on Delivery'),
         ('RazorPay', 'Razor Pay'),
-        ('UPI', 'UPI')
+        ('Wallet', 'Wallet')
     ]
     
     PAYMENT_STATUS_CHOICES = [
