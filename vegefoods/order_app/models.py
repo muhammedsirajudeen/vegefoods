@@ -43,7 +43,7 @@ class Order(models.Model):
 
         # Set estimated delivery date to 6 days from the current date if not already set
         if not self.estimated_delivery_date:
-            self.estimated_delivery_date = timezone.now().date() + timedelta(days=6)
+            self.estimated_delivery_date = timezone.now().date() + timedelta(days=1)
 
         super().save(*args, **kwargs)
 
@@ -69,8 +69,7 @@ class OrderItem(models.Model):
     return_reason = models.TextField(blank=True, null=True)
     
     def __str__(self):
-        return f'{self.quantity} of {self.product.product_name} in order {self.order.id}'
-
+        self.estimated_delivery_date = timezone.now().date() + timedelta(days=1)
 
 
 class Invoice(models.Model):
