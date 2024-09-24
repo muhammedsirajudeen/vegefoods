@@ -11,7 +11,7 @@ import random
 import razorpay
 from django.conf import settings
 from django.http import JsonResponse
-
+from wallet.models import Wallet,WalletTransation
 from django.views.decorators.csrf import csrf_exempt
 from django.core.mail import EmailMessage
 from django.template.loader import render_to_string
@@ -105,12 +105,41 @@ def place_order(request):
                 'error_message': 'Cash on Delivery is not available for orders above ₹1000.'
             })
 
+
+        # Handle Wallet Payment
+        if payment_type == 'Wallet':
+            wallet = Wallet.objects.get(user=user)
+            if wallet.balance < total_price:
+                    return render(request, 'user/checkout.html', {
+                    'address': address,
+                    'cart_items': cart_items_with_subtotals,
+                    'cart': cart,
+                    'subtotal_price': subtotal_price,
+                    'delivery_charge': delivery_charge,
+                    'total_price': total_price,
+                    'error_message': 'Insufficient wallet balance. Please choose another payment method.'
+                })
+
+            wallet.balance -= total_price
+            wallet.save()
+
+            WalletTransation.objects.create(
+                wallet = wallet,
+                transaction_type = 'Debited',
+                amount = total_price,
+
+            )
+        payment_status = 'Success'
+
         new_order = Order.objects.create(
             user=user,
             address=selected_address,
             payment_type=payment_type,
+            payment_status=payment_status,
             total_price=total_price
         )
+
+
 
         for item in cart_items:
             quantity = Decimal(item.quantity)

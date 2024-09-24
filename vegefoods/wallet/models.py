@@ -9,6 +9,8 @@ class WalletTransation(models.Model):
     TRANSACTION_TYPE_CHOICES = [
         ('refund', 'Refund'),
         ('cancellation', 'Cancellation'),
+        ('debited', 'Debited'),
+        
     ]
 
     wallet = models.ForeignKey(Wallet,on_delete=models.CASCADE)
