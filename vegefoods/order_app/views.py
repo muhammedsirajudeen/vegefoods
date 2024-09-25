@@ -19,6 +19,7 @@ from django.utils.html import strip_tags
 from datetime import datetime, timedelta
 from django.utils.timezone import now
 from wallet.models import Wallet,WalletTransation
+from coupen_app.models import Coupon
 from django.utils import timezone
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
@@ -294,6 +295,28 @@ def razorpay_payment_status(request):
         'error_message': 'Invalid request.'
     })
 
+
+
+def apply_coupon(request):
+    if request.method == "POST":
+        coupon_code = request.POST.get("coupon_code")
+
+        try:
+            # Attempt to get the coupon
+            coupon = Coupon.objects.get(code=coupon_code, active=True)
+        except Coupon.DoesNotExist:
+            return JsonResponse({"error": "Invalid coupon code."})
+
+        now = timezone.now().date()
+
+        # Check if the coupon is valid
+        if coupon.valid_from <= now <= coupon.valid_to:
+            # Coupon is valid
+            return JsonResponse({"success": True})
+        else:
+            return JsonResponse({"error": "Coupon is not valid for this purchase."})
+
+    return JsonResponse({"error": "Invalid request."})
 
 @login_required
 def order_success(request):

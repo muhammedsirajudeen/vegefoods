@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
+from django.utils import timezone
 
 # Create your models here.
 class Coupon(models.Model):
@@ -17,9 +18,9 @@ class Coupon(models.Model):
 
 
     def is_valid(self):
-        
         now = timezone.now().date()
         return self.active and self.valid_from <= now <= self.valid_to
+
 
 class UserCoupon(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
