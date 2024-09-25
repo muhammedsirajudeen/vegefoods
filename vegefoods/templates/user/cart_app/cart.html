@@ -80,6 +80,7 @@
         </div>
     </div>
 </section>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -90,7 +91,8 @@ document.addEventListener('DOMContentLoaded', function () {
             subtotal += parseFloat(totalCell.textContent.replace('₹', ''));
         });
 
-        const deliveryCharge = subtotal >= 500 ? 0 : 40;
+        const deliveryCharge = subtotal > 500 ? 0 : 40;
+
         const total = subtotal + deliveryCharge;
 
         document.getElementById('subtotal').textContent = '₹' + subtotal.toFixed(2);
@@ -146,11 +148,19 @@ document.addEventListener('DOMContentLoaded', function () {
             .then(response => response.json())
             .then(data => {
                 if (!data.success) {
-                    alert('Failed to update quantity.');
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to update quantity.',
+                    });
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Something went wrong while updating the quantity.',
+                });
             });
         });
 
@@ -177,6 +187,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (data.success) {
                     this.closest('tr').remove();
                     calculateCartTotals();
+                    window.location.reload()
                 } else {
                     alert('Failed to remove item from cart.');
                 }

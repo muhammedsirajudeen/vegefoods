@@ -57,7 +57,8 @@ def place_order(request):
             'item_subtotal': item_price
         })
 
-    delivery_charge = Decimal('40.00') if subtotal_price <= Decimal('200.00') else Decimal('0.00')
+    delivery_charge = Decimal('0.00') if subtotal_price > Decimal('500.00') else Decimal('40.00')
+
     total_price = subtotal_price + delivery_charge
 
     # Check for coupon in session
