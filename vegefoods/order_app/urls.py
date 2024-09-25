@@ -21,4 +21,5 @@ urlpatterns = [
     path('retry_payment/<int:order_id>/', views.retry_payment, name='retry_payment'),
     path('handle_payment/', views.handle_payment, name='handle_payment'),  # This should match with your form action
     path('apply-coupon/', views.apply_coupon, name='apply_coupon'),
+    path('remove_coupon/', views.remove_coupon, name='remove_coupon'),
     ]

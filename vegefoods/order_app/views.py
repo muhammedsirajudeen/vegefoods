@@ -25,6 +25,7 @@ from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from io import BytesIO
 import csv
+import json 
 
 # Razorpay client initialization
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
@@ -58,6 +59,13 @@ def place_order(request):
 
     delivery_charge = Decimal('40.00') if subtotal_price <= Decimal('200.00') else Decimal('0.00')
     total_price = subtotal_price + delivery_charge
+
+    # Check for coupon in session
+    discount_value = Decimal('0.00')
+    coupon_code = request.session.get('coupon_code')
+    if coupon_code:
+        discount_value = Decimal(request.session.get('discount_value', '0.00'))  # Get discount from session
+        total_price -= discount_value  # Apply discount to total price
 
     if request.method == 'POST':
         selected_address_id = request.POST.get('address')
@@ -137,7 +145,8 @@ def place_order(request):
             address=selected_address,
             payment_type=payment_type,
             payment_status=payment_status,
-            total_price=total_price
+            total_price=total_price,
+            coupon_code=coupon_code
         )
 
 
@@ -184,6 +193,12 @@ def place_order(request):
         email_message.content_subtype = "html"  
         email_message.send()
         print("email sends cod")
+
+        if 'coupon_code' in request.session:
+            del request.session['coupon_code']
+        if 'discount_value' in request.session:
+            del request.session['discount_value']
+
         return redirect(reverse('order_success'))
 
     return render(request, 'user/checkout.html', {
@@ -297,26 +312,51 @@ def razorpay_payment_status(request):
 
 
 
+
+@csrf_exempt  # Use this decorator to exempt this view from CSRF verification
 def apply_coupon(request):
     if request.method == "POST":
-        coupon_code = request.POST.get("coupon_code")
-
         try:
+            # Parse the JSON body
+            data = json.loads(request.body)
+            coupon_code = data.get("coupon_code")  # Get the coupon code from the parsed data
+            print("Coupon code:", coupon_code)
+
             # Attempt to get the coupon
             coupon = Coupon.objects.get(code=coupon_code, active=True)
+
+            now = timezone.now().date()
+
+            # Check if the coupon is valid
+            if coupon.valid_from <= now <= coupon.valid_to:
+                               # Store the coupon details in the session
+                request.session['coupon_code'] = coupon.code
+                request.session['discount_value'] = str(coupon.discount_value)  # Save as string for session storage
+                print(f"copen siscount in session :{request.session['discount_value']}")
+                return JsonResponse({"success": True})
+            else:
+                # Remove coupon details from the session if coupon is invalid
+                request.session.pop('coupon_code', None)
+                request.session.pop('discount_value', None)
+                return JsonResponse({"error": "Coupon is not valid for this purchase."})
+
         except Coupon.DoesNotExist:
             return JsonResponse({"error": "Invalid coupon code."})
-
-        now = timezone.now().date()
-
-        # Check if the coupon is valid
-        if coupon.valid_from <= now <= coupon.valid_to:
-            # Coupon is valid
-            return JsonResponse({"success": True})
-        else:
-            return JsonResponse({"error": "Coupon is not valid for this purchase."})
+        except json.JSONDecodeError:
+            return JsonResponse({"error": "Invalid request body."})
 
     return JsonResponse({"error": "Invalid request."})
+
+@csrf_exempt
+def remove_coupon(request):
+    if request.method == "POST":
+        # Remove coupon details from the session
+        request.session.pop('coupon_code', None)
+        request.session.pop('discount_value', None)
+        return JsonResponse({"success": True})
+
+    return JsonResponse({"error": "Invalid request."})
+
 
 @login_required
 def order_success(request):
