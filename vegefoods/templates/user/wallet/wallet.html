@@ -3,48 +3,55 @@
 {% block title %}Home - Vegefoods{% endblock %}
 
 {% block content %}
-    <section class="ftco-section bg-light">
-        <div class="container">
-            <div class="row">
-                <div class="col-md-12">
-                    <div class="debit-card">
-                        <div class="brand">Vegefoods</div>
-                        <div class="card-number">**** **** **** 1234</div>
-                        <div class="balance">₹{{wallet.balance}}</div>
-                        <div class="expiry">Valid Thru: 12/26</div>
-                    </div>
-
-                    <!-- <form class="mb-4">
-                        <label for="amount">Add Amount</label>
-                        <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter amount">
-                        <button type="submit" class="btn btn-primary mt-3">Add Amount</button>
-                    </form> -->
-
-                    <table class="table table-bordered transactions-table">
-                        <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Amount</th>
-                                <th>Type</th>
-                                <th>Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for wallet_details in wallet_details %}
-                            <!-- Repeat this row for each transaction -->
-                            <tr>
-                                <td>{{wallet_details.id}}</td>
-                                <td>₹{{wallet_details.amount}}</td>
-                                <td>{{wallet_details.transaction_type}}</td>
-                                <td>{{wallet_details.created_at}}</td>
-                            </tr>
-                            {% endfor %}
-                            <!-- End repeat -->
-                        </tbody>
-                    </table>
+<section class="ftco-section bg-light">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="debit-card p-4 mb-4 shadow-sm rounded" style="background: #4CAF50; color: white;">
+                    <div class="brand" style="font-size: 1.5rem; font-weight: bold;">Vegefoods</div>
+                    <div class="card-number mt-2" style="font-size: 1.2rem;">**** **** **** 1234</div>
+                    <div class="balance mt-3" style="font-size: 2rem; font-weight: bold;">₹{{wallet.balance}}</div>
+                    <div class="expiry mt-1" style="font-size: 0.9rem;">Valid Thru: 12/26</div>
                 </div>
+                
+                <!-- Filter Dropdown Button -->
+                
+
+                <table class="table table-hover table-striped table-bordered text-center transactions-table">
+                    <thead class="thead-dark">
+                        <tr>
+                            <th>#</th>
+                            <th>Amount</th>
+                            <th>Type</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for wallet_details in wallet_details %}
+                        <tr>
+                            <td>{{ wallet_details.id }}</td>
+                            <td>₹{{ wallet_details.amount }}</td>
+                            <td>
+                                <span class="badge 
+                                    {% if wallet_details.transaction_type == 'Credit' %}
+                                        bg-success
+                                    {% elif wallet_details.transaction_type == 'Debited' %}
+                                        bg-warning
+                                    {% elif wallet_details.transaction_type == 'Refund' %}
+                                        bg-info
+                                    {% elif wallet_details.transaction_type == 'Cancellation' %}
+                                        bg-danger
+                                    {% endif %}">
+                                    {{ wallet_details.transaction_type }}
+                                </span>
+                            </td>
+                            <td>{{ wallet_details.created_at}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
             </div>
         </div>
-    </section>
-
-    {% endblock %}
+    </div>
+</section>
+{% endblock %}

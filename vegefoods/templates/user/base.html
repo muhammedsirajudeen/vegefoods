@@ -31,6 +31,7 @@
     <!-- Bootstrap CSS -->
     <link href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <!-- Bootstrap Bundle with Popper -->
 
@@ -232,7 +233,7 @@
                             <span class="text">youremail@email.com</span>
                         </div>
                         <div class="col-md-5 pr-4 d-flex topper align-items-center text-lg-right">
-                            <span class="text">3-5 Business days delivery & Free Returns</span>
+                            <span class="text">Delivery within 24 hours</span>
                         </div>
                     </div>
                 </div>
@@ -258,8 +259,8 @@
 
                     </div>
                 </li>
-                <li class="nav-item"><a href="about.html" class="nav-link">About</a></li>
-                <li class="nav-item"><a href="contact.html" class="nav-link">Contact</a></li>
+                <li class="nav-item"><a href="{% url 'about' %}" class="nav-link">About</a></li>
+                <li class="nav-item"><a href="{% url 'contact' %}" class="nav-link">Contact</a></li>
             </ul>
         </div>
 
@@ -284,7 +285,10 @@
             </li>
 
             <!-- Cart Icon -->
-            <li class="nav-item list-unstyled"><a href="{% url 'cart' %}" class="nav-link"><span class="icon-shopping_cart"></span>[0]</a></li>
+            <li class="nav-item list-unstyled"><a href="{% url 'cart' %}" class="nav-link cartcount">
+            
+            </a>
+            </li>
 
             <!-- Search Icon -->
             <!-- Search Icon -->
@@ -413,6 +417,20 @@
             searchForm.style.display = 'none';
         }
     });
+    async function updateCartCount() {
+            try {
+                const response = await fetch('{% url "count_cart" %}');  // Adjust the URL to match your view
+                const data = await response.json();
+                document.querySelector('.cartcount').innerHTML = `<span class="icon-shopping_cart"></span>[${data.count}]`;
+            } catch (error) {
+                console.error('Error fetching cart count:', error);
+            }
+        }
+    
+        // Call the function when the page loads
+        document.addEventListener('DOMContentLoaded', updateCartCount);
     </script>
+   
+    
 </body>
 </html>

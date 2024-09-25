@@ -28,7 +28,13 @@ def add_to_cart(request):
 
         cart, created = Cart.objects.get_or_create(user=request.user)
         
-        
+        cart_item = CartItem.objects.filter(cart=cart, product=product).first()
+        if cart_item:
+            return JsonResponse({
+                'success': False,
+                'message': 'Item already in your cart. You can update the quantity from the cart.'
+            })
+            
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
         if not created:
             cart_item.quantity += int(quantity)  # If it exists, update the quantity

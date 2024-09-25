@@ -15,11 +15,28 @@ from django.contrib.auth import login
 import re
 from product_apps.models import Product
 from wallet.models import Wallet
+from cart_app.models import Cart,CartItem
+from django.http import JsonResponse
 # Create your views here.
 
 
 def redirect_to_home(request):
     return redirect('home')
+
+def count_cart(request):
+    user = request.user
+    if user.is_authenticated:
+        try:
+            # Get the user's cart
+            cart = Cart.objects.get(user=user)
+            # Count the number of unique products in the cart
+            count_cartitems = cart.items.count()  # Use related_name 'items' to access cart items
+        except Cart.DoesNotExist:
+            count_cartitems = 0
+    else:
+        count_cartitems = 0
+
+    return JsonResponse({'count': count_cartitems})
 
 @never_cache
 def user_home(request):
@@ -176,3 +193,11 @@ class CustomPasswordResetView(PasswordResetView):
                 'error': 'No account found with this email address.'
             })
         return super().form_valid(form)
+
+
+def About_page(request):
+    return render(request,'user/About/about.html')
+
+
+def Contact_page(request):
+    return render(request,'user/About/contact.html')
