@@ -615,7 +615,7 @@ def process_cancel_refund(order_item):
    
     WalletTransation.objects.create(
         wallet=wallet,
-        transaction_type='cancellation!',
+        transaction_type='cancellation',
         amount=refund_amount,
         created_at=timezone.now()
     )

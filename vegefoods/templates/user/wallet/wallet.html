@@ -15,7 +15,19 @@
                 </div>
                 
                 <!-- Filter Dropdown Button -->
-                
+                <div class="d-flex justify-content-end mb-3">
+                    <div class="dropdown">
+                        <button class="btn btn-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                            Filter Transactions
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                            <li><a class="dropdown-item" href="?filter=all">All</a></li>
+                            <li><a class="dropdown-item" href="?filter=debited">Debited</a></li>
+                            <li><a class="dropdown-item" href="?filter=refund">Refund</a></li>
+                            <li><a class="dropdown-item" href="?filter=Cancellation">Cancellation</a></li>
+                        </ul>
+                    </div>
+                </div>
 
                 <table class="table table-hover table-striped table-bordered text-center transactions-table">
                     <thead class="thead-dark">
@@ -27,25 +39,27 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for wallet_details in wallet_details %}
+                        {% for transaction in wallet_details %}
                         <tr>
-                            <td>{{ wallet_details.id }}</td>
-                            <td>₹{{ wallet_details.amount }}</td>
+                            <td>{{ transaction.id }}</td>
                             <td>
-                                <span class="badge 
-                                    {% if wallet_details.transaction_type == 'Credit' %}
-                                        bg-success
-                                    {% elif wallet_details.transaction_type == 'Debited' %}
-                                        bg-warning
-                                    {% elif wallet_details.transaction_type == 'Refund' %}
-                                        bg-info
-                                    {% elif wallet_details.transaction_type == 'Cancellation' %}
-                                        bg-danger
-                                    {% endif %}">
-                                    {{ wallet_details.transaction_type }}
+                                <span 
+                                    style="{% if transaction.transaction_type|lower == 'debited' %}color: red;{% elif transaction.transaction_type|lower == 'refund' or transaction.transaction_type|lower == 'cancellation' %}color: green;{% endif %}">
+                                    {% if transaction.transaction_type|lower == 'debited' %}
+                                        - ₹{{ transaction.amount }}
+                                    {% else %}
+                                        + ₹{{ transaction.amount }}
+                                    {% endif %}
                                 </span>
                             </td>
-                            <td>{{ wallet_details.created_at}}</td>
+                            
+                            <td>
+                                <span 
+                                    style="{% if transaction.transaction_type|lower == 'credit' %}color: green;{% elif transaction.transaction_type|lower == 'debited' %}color: red;{% elif transaction.transaction_type|lower == 'refund' %}color: green;{% elif transaction.transaction_type|lower == 'cancellation' %}color: green;{% endif %}">
+                                    {{ transaction.transaction_type|capfirst }}
+                                </span>
+                            </td>
+                            <td>{{ transaction.created_at }}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
