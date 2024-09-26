@@ -32,7 +32,7 @@
                 <table class="table table-hover table-striped table-bordered text-center transactions-table">
                     <thead class="thead-dark">
                         <tr>
-                            <th>#</th>
+                            
                             <th>Amount</th>
                             <th>Type</th>
                             <th>Date</th>
@@ -41,7 +41,7 @@
                     <tbody>
                         {% for transaction in wallet_details %}
                         <tr>
-                            <td>{{ transaction.id }}</td>
+                           
                             <td>
                                 <span 
                                     style="{% if transaction.transaction_type|lower == 'debited' %}color: red;{% elif transaction.transaction_type|lower == 'refund' or transaction.transaction_type|lower == 'cancellation' %}color: green;{% endif %}">
