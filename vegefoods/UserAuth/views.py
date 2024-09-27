@@ -226,3 +226,31 @@ def Contact_page(request):
     
 
     return render(request,'user/About/contact.html')
+
+@login_required
+def get_wallet_balance(request):
+    try:
+        wallet = Wallet.objects.get(user=request.user)
+        balance = wallet.balance
+        return JsonResponse({'balance': str(balance)})
+    except Wallet.DoesNotExist:
+        return JsonResponse({'error': 'Wallet not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+@login_required
+def get_latest_complaint_status(request):
+    try:
+        message = Message.objects.get(user=request.user)
+        latest_complaint_subject = message.subject
+        latest_complaint_status = message.status
+        return JsonResponse({
+            'subject': latest_complaint_subject,
+            'status': latest_complaint_status,
+            'error': False  # Indicate no error occurred
+        })
+    except Message.DoesNotExist:
+        return JsonResponse({
+            'error': True,
+            'message': 'No complaints found for this user.'
+        })
