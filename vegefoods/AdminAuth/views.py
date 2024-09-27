@@ -6,6 +6,7 @@ from order_app.models import Order,OrderItem
 from category_app.models import Category
 from django.db.models.functions import ExtractMonth
 from django.http import JsonResponse
+from UserAuth.models import Message
 
 
 def admin_login(request):
@@ -166,3 +167,12 @@ def get_monthly_orders(request, year):
         'data': monthly_data
     })
 
+def complaint_message(request):
+    messages = Message.objects.all()
+    return render(request,'admin/message.html',{'message':messages})
+
+def change_message_status(request,message_id):
+    message =  get_object_or_404(Message,id=message_id)
+    message.status = 'solved'
+    message.save()
+    return redirect('messages')

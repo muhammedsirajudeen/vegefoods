@@ -19,3 +19,23 @@ class OTP(models.Model):
 
     def __str__(self):
         return f'{self.user.username} - {self.otp_code}'
+
+
+class Message(models.Model):
+    STATUS = [
+        ('pending', 'Pending'),
+        ('solved', 'Solved')
+    ]
+    name = models.CharField(max_length=100)  # Increased length for names
+    email = models.EmailField(max_length=100)  # Changed to EmailField with increased length
+    phone_number = models.CharField(max_length=14)  # This is fine as is, but validate formats
+    subject = models.CharField(max_length=100)  # Increased length for subjects
+    message = models.TextField()  # Use TextField for longer messages
+    status = models.CharField(max_length=20, choices=STATUS, default='pending')  # Default status
+    created_at = models.DateField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} complaint: {self.subject}"
+    
+
+

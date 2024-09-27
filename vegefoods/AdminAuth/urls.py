@@ -26,5 +26,7 @@ urlpatterns = [
     path('user/<int:user_id>/block-unblock/',views.block_unblock_user,name='block_unblock_user'),
     path('ledger_book/',views.ledger_book_view,name='ledger_book_view'),
     path('panel/year/<int:year>/', views.get_monthly_orders, name='monthly_orders'),
+    path('messages/', views.complaint_message, name='messages'),
+    path('change_status/<int:message_id>', views.change_message_status, name='change_message_status'),
     path('logout',views.logout,name='logout'),
 ]

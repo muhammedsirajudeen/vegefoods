@@ -17,6 +17,9 @@ from product_apps.models import Product
 from wallet.models import Wallet
 from cart_app.models import Cart,CartItem
 from django.http import JsonResponse
+from    . models import Message
+from django.contrib import messages
+
 # Create your views here.
 
 
@@ -200,4 +203,26 @@ def About_page(request):
 
 
 def Contact_page(request):
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        email = request.POST.get('email')
+        phone_number = request.POST.get('phone')
+        subject = request.POST.get('complaint_subject')
+        message = request.POST.get('message')
+
+        new_message = Message(
+            name = name,
+            email = email,
+            phone_number = phone_number,
+            subject = subject,
+            message = message,
+            status='pending'
+        )
+        new_message.save()
+        messages.success(request, "Message sent successfully! Our team will contact you within 10 minutes.")
+        print("sended")
+
+        return redirect('contact')
+    
+
     return render(request,'user/About/contact.html')
