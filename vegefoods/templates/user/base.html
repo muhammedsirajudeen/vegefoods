@@ -209,6 +209,13 @@
         .transactions-table th, .transactions-table td {
             text-align: center;
         }
+        @keyframes shake {
+    0% { transform: translate(0); }
+    25% { transform: translate(-5px); }
+    50% { transform: translate(5px); }
+    75% { transform: translate(-5px); }
+    100% { transform: translate(0); }
+}
 
     </style>
 
@@ -408,6 +415,7 @@
     <script src="{% static 'js/bootstrap-datepicker.js' %}"></script>
     <script src="{% static 'js/scrollax.min.js' %}"></script>
     <script src="{% static 'js/main.js' %}"></script>   
+    <script src="{% static 'js/chatbot.js' %}"></script>
     <script>
          document.getElementById('search-icon').addEventListener('click', function(event) {
         event.preventDefault();

@@ -13,12 +13,14 @@ import random
 from django.http import JsonResponse
 from django.contrib.auth import login
 import re
+import random
 from product_apps.models import Product
 from wallet.models import Wallet
 from cart_app.models import Cart,CartItem
 from django.http import JsonResponse
 from    . models import Message
 from django.contrib import messages
+from order_app.models   import Order,OrderItem
 
 # Create your views here.
 
@@ -204,6 +206,7 @@ def About_page(request):
 
 def Contact_page(request):
     if request.method == 'POST':
+       
         name = request.POST.get('name')
         email = request.POST.get('email')
         phone_number = request.POST.get('phone')
@@ -211,6 +214,7 @@ def Contact_page(request):
         message = request.POST.get('message')
 
         new_message = Message(
+            
             name = name,
             email = email,
             phone_number = phone_number,
@@ -226,3 +230,44 @@ def Contact_page(request):
     
 
     return render(request,'user/About/contact.html')
+
+@login_required
+def get_wallet_balance(request):
+    try:
+        wallet = Wallet.objects.get(user=request.user)
+        balance = wallet.balance
+        return JsonResponse({'balance': str(balance)})
+    except Wallet.DoesNotExist:
+        return JsonResponse({'error': 'Wallet not found.'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+def recipe_suggestions(request):
+    # Example of predefined recipes with video links
+    recipes = [
+        {
+            "name": "Vegetable Stir-Fry",
+            "description": "A mix of fresh vegetables sautéed in soy sauce.",
+            "video_link": "https://example.com/video/vegetable-stir-fry"
+        },
+        {
+            "name": "Fruit Salad",
+            "description": "A refreshing salad with seasonal fruits.",
+            "video_link": "https://example.com/video/fruit-salad"
+        },
+        {
+            "name": "Juice Blend",
+            "description": "A smoothie made from our fresh fruits and vegetables.",
+            "video_link": "https://example.com/video/juice-blend"
+        },
+        {
+            "name": "Dried Fruit Trail Mix",
+            "description": "A blend of dried fruits and nuts.",
+            "video_link": "https://example.com/video/dried-fruit-trail-mix"
+        }
+    ]
+    
+    # Randomly pick a recipe
+    selected_recipe = random.choice(recipes)
+    
+    return JsonResponse({'recipe': selected_recipe})

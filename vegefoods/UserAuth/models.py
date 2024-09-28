@@ -26,6 +26,7 @@ class Message(models.Model):
         ('pending', 'Pending'),
         ('solved', 'Solved')
     ]
+    
     name = models.CharField(max_length=100)  # Increased length for names
     email = models.EmailField(max_length=100)  # Changed to EmailField with increased length
     phone_number = models.CharField(max_length=14)  # This is fine as is, but validate formats
@@ -36,6 +37,3 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.name} complaint: {self.subject}"
-    
-
-
