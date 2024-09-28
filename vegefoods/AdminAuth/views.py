@@ -169,7 +169,10 @@ def get_monthly_orders(request, year):
 
 def complaint_message(request):
     messages = Message.objects.all()
-    return render(request,'admin/message.html',{'message':messages})
+    messages_count = Message.objects.count
+    pending_message_count = Message.objects.filter(status='Pending').count()
+    success_message_count = Message.objects.filter(status='Sucess').count()
+    return render(request,'admin/message.html',{'message':messages,'messages_count':messages_count})
 
 def change_message_status(request,message_id):
     message =  get_object_or_404(Message,id=message_id)

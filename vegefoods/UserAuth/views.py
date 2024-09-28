@@ -204,6 +204,7 @@ def About_page(request):
 
 def Contact_page(request):
     if request.method == 'POST':
+       
         name = request.POST.get('name')
         email = request.POST.get('email')
         phone_number = request.POST.get('phone')
@@ -211,6 +212,7 @@ def Contact_page(request):
         message = request.POST.get('message')
 
         new_message = Message(
+            
             name = name,
             email = email,
             phone_number = phone_number,

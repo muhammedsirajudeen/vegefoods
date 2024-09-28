@@ -1,0 +1,46 @@
+{% load static %}
+  <!-- Chatbot Icon -->
+  {% if user.is_authenticated %}
+<div id="chatbot-icon" style="position: fixed; bottom: 20px; right: 20px; cursor: pointer; animation: shake 0.8s infinite;">
+    <img src="{% static 'images/chatbot.png' %}" alt="Chatbot Icon" style="width: 160px; height: 160px;">
+</div>
+{% endif %}
+<!-- Chat Section -->
+
+<section id="chat-section" style="display: none; position: fixed; bottom: 100px; right: 20px; width: 60%; z-index: 1000;">
+    <div class="container py-5">
+        <div class="row d-flex justify-content-center">
+            <div class="col-md-10 col-lg-8 col-xl-6">
+                <div class="card" id="chat2">
+                    <div class="card-header d-flex justify-content-between align-items-center p-3">
+                        <h5 class="mb-0">Chat</h5>
+                        <button type="button" class="btn btn-primary btn-sm" id="close-chat">Close</button>
+                    </div>
+                    <div class="card-body" style="position: relative; height: 400px; overflow-y: auto;">
+                        <!-- Initial bot message -->
+                        <div class="d-flex flex-row justify-content-start mb-4">
+                            <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="avatar 1" style="width: 45px; height: 100%;">
+                            <div class="ms-3">
+                                <p class="small p-2 mb-1 rounded-3 bg-body-tertiary" style="font-size: 1.1rem;">Hi {{user}}, I am here to help you. Go ahead, select your issue:</p>
+                                <div class="d-flex flex-column">
+                                    <button class="btn btn-outline-primary btn-sm mb-2" onclick="fetchWalletBalance()">Wallet Balance</button>
+                                    <button class="btn btn-outline-primary btn-sm mb-2" onclick="fetchLatestComplaintStatus()">Latest Complaint Status</button>
+                                    <button class="btn btn-outline-primary btn-sm mb-2" onclick="showReturnPolicy()">Return Policy</button>
+                                    <button class="btn btn-outline-primary btn-sm mb-2" onclick="showCustomerCareMessage()">Customer Care Support</button>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Area to display the response -->
+                        <div id="response"></div>
+                    </div>
+                    <div class="card-footer text-muted d-flex align-items-center p-3">
+                        <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="avatar 3" style="width: 40px; height: auto;">
+                        <input type="text" class="form-control form-control-lg ms-3" id="chat-input" placeholder="Type message" style="flex-grow: 1;">
+                        <a class="ms-3" href="#!"><i class="fas fa-paper-plane" style="font-size: 1.5rem;"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

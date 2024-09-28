@@ -36,5 +36,5 @@ urlpatterns = [
     path('about/', views.About_page, name='about'),  # Add this line
     path('contact/', views.Contact_page, name='contact'),  # Add this line
     path('api/wallet-balance/', views.get_wallet_balance, name='wallet_balance'),
-    path('api/latest-complaint-status/', views.get_latest_complaint_status, name='latest_complaint_status'),
+    # path('api/latest-complaint-status/', views.get_latest_complaint_status, name='latest_complaint_status'),
 ]
