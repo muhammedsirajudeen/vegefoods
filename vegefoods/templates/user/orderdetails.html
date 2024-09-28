@@ -118,18 +118,18 @@
 <!-- Review Submission Form -->
 {% if  order_items.status == "Delivered" or  order_items.status == "Reject Returned"  %}
 <h5 class="mt-4">Submit Your Review</h5>
+
 <form action="/submit_review" method="POST">
   <div class="form-group">
     <label for="rating">Rating:</label>
-    <div class="review-stars">
-        <div class="review-stars">
-            <span>&#9733;</span>
-            <span>&#9733;</span>
-            <span>&#9733;</span>
-            <span>&#9733;</span>
-            <span>&#9733;</span>
-          </div>
+    <div class="review-stars" id="review-stars">
+        <span class="star" data-value="1">&#9733;</span>
+        <span class="star" data-value="2">&#9733;</span>
+        <span class="star" data-value="3">&#9733;</span>
+        <span class="star" data-value="4">&#9733;</span>
+        <span class="star" data-value="5">&#9733;</span>
     </div>
+    <input type="hidden" name="rating" id="rating" required>
   </div>
   <div class="form-group">
     <label for="review">Your Review:</label>
@@ -137,6 +137,7 @@
   </div>
   <button type="submit" class="btn btn-primary">Submit Review</button>
 </form>
+
 {% else %}
 
 {% endif %}
@@ -169,6 +170,28 @@
         var form = document.getElementById('returnOrderForm');
         form.style.display = form.style.display === 'none' ? 'block' : 'none';
     });
+
+    document.addEventListener('DOMContentLoaded', function () {
+    const stars = document.querySelectorAll('.star');
+    const ratingInput = document.getElementById('rating');
+
+    stars.forEach(star => {
+        star.addEventListener('click', function () {
+            // Clear previous selections
+            stars.forEach(s => s.classList.remove('selected'));
+
+            // Highlight the selected stars
+            const ratingValue = this.getAttribute('data-value');
+            for (let i = 0; i < ratingValue; i++) {
+                stars[i].classList.add('selected');
+            }
+
+            // Set the hidden input value
+            ratingInput.value = ratingValue;
+        });
+    });
+});
+
     </script>
   {% endblock %}
   <!-- JavaScript to toggle form visibility -->
