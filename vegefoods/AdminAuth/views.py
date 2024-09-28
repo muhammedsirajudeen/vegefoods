@@ -169,13 +169,18 @@ def get_monthly_orders(request, year):
 
 def complaint_message(request):
     messages = Message.objects.all()
-    messages_count = Message.objects.count
-    pending_message_count = Message.objects.filter(status='Pending').count()
-    success_message_count = Message.objects.filter(status='Sucess').count()
-    return render(request,'admin/message.html',{'message':messages,'messages_count':messages_count})
+    messages_count = Message.objects.count()
+    pending_message_count = Message.objects.filter(status='pending').count()
+    success_message_count = Message.objects.filter(status='solved').count()
+    return render(request, 'admin/message.html', {
+        'message': messages,
+        'messages_count': messages_count,
+        'pending_message_count': pending_message_count,
+        'success_message_count': success_message_count
+    })
 
-def change_message_status(request,message_id):
-    message =  get_object_or_404(Message,id=message_id)
-    message.status = 'solved'
+def change_message_status(request, message_id):
+    message = get_object_or_404(Message, id=message_id)
+    message.status = 'solved'  # Make sure the status value matches the choice (in lowercase)
     message.save()
-    return redirect('messages')
+    return redirect('messages')  # Replace 'messages' with the correct URL name for your view that displays the table

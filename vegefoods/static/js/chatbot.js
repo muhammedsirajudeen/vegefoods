@@ -48,7 +48,7 @@ function fetchWalletBalance() {
                 <div class="d-flex flex-row justify-content-start mb-4">
                     <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="bot avatar" style="width: 45px; height: 100%;">
                     <div class="ms-3">
-                        <p class="small p-2 mb-1 rounded-3 bg-body-tertiary" style="font-size: 1rem;">Your current wallet balance is: $${data.balance}</p>
+                        <p class="small p-2 mb-1 rounded-3 bg-body-tertiary" style="font-size: 1rem;">Your current wallet balance is:  ₹${data.balance}</p>
                          <!-- Feedback buttons -->
         <div class="d-flex">
             <button class="btn btn-outline-success me-2" onclick="handleFeedback('helpful')">👍 Helpful</button>
@@ -63,36 +63,7 @@ function fetchWalletBalance() {
         .catch(error => console.error('Error fetching wallet balance:', error));
 }
 
-function fetchLatestComplaintStatus() {
-    showUserMessage("Latest Complaint Status"); // Display the user's selection as a user-side message
 
-    fetch('/user/api/latest-complaint-status/')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-            return response.json();
-        })
-        .then(data => {
-            const responseDiv = document.getElementById('response');
-            const botMessageHTML = `
-                <div class="d-flex flex-row justify-content-start mb-4">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="bot avatar" style="width: 45px; height: 100%;">
-                    <div class="ms-3">
-                        <p class="small p-2 mb-1 rounded-3 bg-body-tertiary">Your latest complaint: ${data.subject} - Status: ${data.status}</p>
-                         <!-- Feedback buttons -->
-        <div class="d-flex">
-            <button class="btn btn-outline-success me-2" onclick="handleFeedback('helpful')">👍 Helpful</button>
-            <button class="btn btn-outline-danger" onclick="handleFeedback('dislike')">👎 Dislike</button>
-        </div>
-                    </div>
-                </div>
-            `;
-            responseDiv.insertAdjacentHTML('beforeend', botMessageHTML);
-            responseDiv.scrollTop = responseDiv.scrollHeight; // Scroll to the latest message
-        })
-        .catch(error => console.error('Error fetching latest complaint status:', error));
-}
 
 function showCustomerCareMessage() {
     showUserMessage("Customer Care Support"); // Display the user's selection
@@ -172,4 +143,63 @@ document.getElementById('close-chat').addEventListener('click', function() {
     
 });
 
+function fetchRecipeSuggestions() {
+    showUserMessage("Recipe Suggestions"); // Display the user's selection
 
+    fetch('/user/api/recipe-suggestions/')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const responseDiv = document.getElementById('response');
+            const botMessageHTML = `
+                <div class="d-flex flex-row justify-content-start mb-4">
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="bot avatar" style="width: 45px; height: 100%;">
+                    <div class="ms-3">
+                        <p class="small p-2 mb-1 rounded-3 bg-body-tertiary">${data.recipe}</p>
+                    </div>
+                </div>
+            `;
+            responseDiv.insertAdjacentHTML('beforeend', botMessageHTML);
+            responseDiv.scrollTop = responseDiv.scrollHeight; // Scroll to the latest message
+        })
+        .catch(error => console.error('Error fetching recipe suggestions:', error));
+}
+
+
+
+function fetchRecipeSuggestions() {
+    showUserMessage("Recipe Suggestions"); // Display the user's selection
+
+    const ingredients = ["carrot", "apple", "spinach"]; // Replace with actual fresh ingredients
+
+    fetch(`/user/api/recipe-suggestions/?ingredients=${ingredients.join(',')}`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            const responseDiv = document.getElementById('response');
+            const recipe = data.recipe;
+            const botMessageHTML = `
+                <div class="d-flex flex-row justify-content-start mb-4">
+                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="bot avatar" style="width: 45px; height: 100%;">
+                    <div class="ms-3">
+                        <p class="small p-2 mb-1 rounded-3 bg-body-tertiary" style="font-size: 1.1rem;">
+                            Here's a recipe suggestion: <strong>${recipe.name}</strong><br>
+                            ${recipe.description}<br>
+                            <a href="${recipe.video_link}" target="_blank">Watch Video</a>
+                        </p>
+                    </div>
+                </div>
+            `;
+            responseDiv.insertAdjacentHTML('beforeend', botMessageHTML);
+            responseDiv.scrollTop = responseDiv.scrollHeight; // Scroll to the latest message
+        })
+        .catch(error => console.error('Error fetching recipe suggestions:', error));
+}

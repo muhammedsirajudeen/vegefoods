@@ -13,12 +13,14 @@ import random
 from django.http import JsonResponse
 from django.contrib.auth import login
 import re
+import random
 from product_apps.models import Product
 from wallet.models import Wallet
 from cart_app.models import Cart,CartItem
 from django.http import JsonResponse
 from    . models import Message
 from django.contrib import messages
+from order_app.models   import Order,OrderItem
 
 # Create your views here.
 
@@ -240,19 +242,32 @@ def get_wallet_balance(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
-@login_required
-def get_latest_complaint_status(request):
-    try:
-        message = Message.objects.get(user=request.user)
-        latest_complaint_subject = message.subject
-        latest_complaint_status = message.status
-        return JsonResponse({
-            'subject': latest_complaint_subject,
-            'status': latest_complaint_status,
-            'error': False  # Indicate no error occurred
-        })
-    except Message.DoesNotExist:
-        return JsonResponse({
-            'error': True,
-            'message': 'No complaints found for this user.'
-        })
+def recipe_suggestions(request):
+    # Example of predefined recipes with video links
+    recipes = [
+        {
+            "name": "Vegetable Stir-Fry",
+            "description": "A mix of fresh vegetables sautéed in soy sauce.",
+            "video_link": "https://example.com/video/vegetable-stir-fry"
+        },
+        {
+            "name": "Fruit Salad",
+            "description": "A refreshing salad with seasonal fruits.",
+            "video_link": "https://example.com/video/fruit-salad"
+        },
+        {
+            "name": "Juice Blend",
+            "description": "A smoothie made from our fresh fruits and vegetables.",
+            "video_link": "https://example.com/video/juice-blend"
+        },
+        {
+            "name": "Dried Fruit Trail Mix",
+            "description": "A blend of dried fruits and nuts.",
+            "video_link": "https://example.com/video/dried-fruit-trail-mix"
+        }
+    ]
+    
+    # Randomly pick a recipe
+    selected_recipe = random.choice(recipes)
+    
+    return JsonResponse({'recipe': selected_recipe})
