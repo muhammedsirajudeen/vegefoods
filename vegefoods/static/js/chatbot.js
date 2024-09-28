@@ -143,63 +143,41 @@ document.getElementById('close-chat').addEventListener('click', function() {
     
 });
 
-function fetchRecipeSuggestions() {
-    showUserMessage("Recipe Suggestions"); // Display the user's selection
 
+
+function fetchRecipeSuggestions() {
+    showUserMessage("Recipe Suggestions");
+
+    // Make the AJAX request to the Django API endpoint
     fetch('/user/api/recipe-suggestions/')
         .then(response => {
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error('Network response was not ok');
             }
             return response.json();
         })
         .then(data => {
-            const responseDiv = document.getElementById('response');
-            const botMessageHTML = `
-                <div class="d-flex flex-row justify-content-start mb-4">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="bot avatar" style="width: 45px; height: 100%;">
-                    <div class="ms-3">
-                        <p class="small p-2 mb-1 rounded-3 bg-body-tertiary">${data.recipe}</p>
-                    </div>
+            // Clear previous messages
+            // (You can decide to clear the messages or keep them as needed)
+
+            // Check if there are recipes in the response
+            if (data.recipes && Array.isArray(data.recipes) && data.recipes.length > 0) {
+                // Create HTML to display all recipes
+                const recipesHtml = data.recipes.map(recipe => `
+                       <div class="alert alert-light mb-3" role="alert">
+                    <h5 class="alert-heading">${recipe.name}</h5>
+                    <p>${recipe.description}</p>
+                    <a href="${recipe.video_link}" target="_blank" class="btn btn-link">Watch Recipe Video</a>
                 </div>
-            `;
-            responseDiv.insertAdjacentHTML('beforeend', botMessageHTML);
-            responseDiv.scrollTop = responseDiv.scrollHeight; // Scroll to the latest message
-        })
-        .catch(error => console.error('Error fetching recipe suggestions:', error));
-}
+                `).join('');  // Combine all recipe HTML into a single string
 
-
-
-function fetchRecipeSuggestions() {
-    showUserMessage("Recipe Suggestions"); // Display the user's selection
-
-    const ingredients = ["carrot", "apple", "spinach"]; // Replace with actual fresh ingredients
-
-    fetch(`/user/api/recipe-suggestions/?ingredients=${ingredients.join(',')}`)
-        .then(response => {
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                displayFeedbackMessage(recipesHtml); // Display all recipes as a feedback message
+            } else {
+                displayFeedbackMessage('No recipes found.');
             }
-            return response.json();
         })
-        .then(data => {
-            const responseDiv = document.getElementById('response');
-            const recipe = data.recipe;
-            const botMessageHTML = `
-                <div class="d-flex flex-row justify-content-start mb-4">
-                    <img src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-chat/ava3-bg.webp" alt="bot avatar" style="width: 45px; height: 100%;">
-                    <div class="ms-3">
-                        <p class="small p-2 mb-1 rounded-3 bg-body-tertiary" style="font-size: 1.1rem;">
-                            Here's a recipe suggestion: <strong>${recipe.name}</strong><br>
-                            ${recipe.description}<br>
-                            <a href="${recipe.video_link}" target="_blank">Watch Video</a>
-                        </p>
-                    </div>
-                </div>
-            `;
-            responseDiv.insertAdjacentHTML('beforeend', botMessageHTML);
-            responseDiv.scrollTop = responseDiv.scrollHeight; // Scroll to the latest message
-        })
-        .catch(error => console.error('Error fetching recipe suggestions:', error));
+        .catch(error => {
+            displayFeedbackMessage('Error fetching recipe suggestions: ' + error.message);
+        });
 }
+

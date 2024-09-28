@@ -21,7 +21,8 @@ from django.http import JsonResponse
 from    . models import Message
 from django.contrib import messages
 from order_app.models   import Order,OrderItem
-
+import google.generativeai as genai
+import json
 # Create your views here.
 
 
@@ -243,31 +244,44 @@ def get_wallet_balance(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 def recipe_suggestions(request):
-    # Example of predefined recipes with video links
-    recipes = [
-        {
-            "name": "Vegetable Stir-Fry",
-            "description": "A mix of fresh vegetables sautéed in soy sauce.",
-            "video_link": "https://example.com/video/vegetable-stir-fry"
-        },
-        {
-            "name": "Fruit Salad",
-            "description": "A refreshing salad with seasonal fruits.",
-            "video_link": "https://example.com/video/fruit-salad"
-        },
-        {
-            "name": "Juice Blend",
-            "description": "A smoothie made from our fresh fruits and vegetables.",
-            "video_link": "https://example.com/video/juice-blend"
-        },
-        {
-            "name": "Dried Fruit Trail Mix",
-            "description": "A blend of dried fruits and nuts.",
-            "video_link": "https://example.com/video/dried-fruit-trail-mix"
-        }
-    ]
+    try:
+        genai.configure(api_key='AIzaSyA0EYygoQ-gdsUT-rR18QsDzP4g0yvzpR8')
+        model = genai.GenerativeModel("gemini-1.5-flash")
+        response = model.generate_content("Generate a list of 1 recipes with their names, descriptions, and YouTube video links. recipes want to include vegetables or fruits or juices or Dried fruits generates formats the data Adhere strictly to the given JSON Format")
+
+        # Log the raw response from the model
+        print("Raw response:", response.text)
+
+        # Parse the response
+        recipes =extract_json_from_text(response.text)
+
+        # Ensure we have at least one recipe in the list
+        if recipes and isinstance(recipes, list) and len(recipes) > 0:
+            # Return all recipes as JSON
+            return JsonResponse({'recipes': recipes})  # Return the full list
+
+        else:
+            return JsonResponse({'error': 'No recipes generated.'}, status=500)
+
+    except json.JSONDecodeError:
+        print("Failed to decode JSON: ", response.text)
+        return JsonResponse({'error': 'Response is not valid JSON.'}, status=500)
+    except Exception as e:
+        print(f"Error: {e}")
+        return JsonResponse({'error': 'Failed to generate recipes.'}, status=500)
+
+
+def extract_json_from_text(text):
+    # Regular expression to find JSON-like structures in the text
+    json_match = re.search(r"\[.*\]", text, re.DOTALL)
     
-    # Randomly pick a recipe
-    selected_recipe = random.choice(recipes)
-    
-    return JsonResponse({'recipe': selected_recipe})
+    if json_match:
+        json_str = json_match.group()  # Extracted JSON string
+        try:
+            json_data = json.loads(json_str)  # Convert string to JSON (Python dictionary)
+            return json_data
+        except json.JSONDecodeError:
+            print("Invalid JSON format")
+    else:
+        print("No JSON found")
+    return None
