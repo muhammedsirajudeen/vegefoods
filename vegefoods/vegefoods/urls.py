@@ -35,3 +35,4 @@ urlpatterns = [
     path('', views.redirect_to_home), 
 ]
 
+handler404 = "UserAuth.views.handle_not_found"
