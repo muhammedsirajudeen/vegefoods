@@ -118,7 +118,7 @@ def edit_product(request, product_id):
 def toggle_product_listing(request, product_id):
     if not request.user.is_authenticated or not request.user.is_superuser:
         return redirect('admin_login') 
-    print(f"Toggling listing for product_id: {product_id}")
+    
     product = get_object_or_404(Product, id=product_id)
     product.is_listed = not product.is_listed
     product.save()

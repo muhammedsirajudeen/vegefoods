@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect,get_object_or_404
 from address_app.models import Address
 
 
-# Create your views here.
+
 def user_address(request):
 
     address = Address.objects.filter(user = request.user)
@@ -39,7 +39,7 @@ def add_address(request):
             address = address,
             address_type = address_type
         )
-        return redirect('user_address')  # Redirect to address list page after saving
+        return redirect('user_address')  
 
     return render(request, "user/address_app/add_address.html")
 
@@ -60,7 +60,7 @@ def edit_address(request, address_id):
         address.address_type= request.POST.get("addressType")
         address.save()
         
-        return redirect('user_address')  # Redirect to address list page after saving
+        return redirect('user_address')  
 
     return render(request,"user/address_app/edit_address.html",{'address': address})
 

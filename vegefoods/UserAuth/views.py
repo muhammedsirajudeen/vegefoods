@@ -171,7 +171,7 @@ def user_login(request):
     if request.method == 'POST':
         username = request.POST.get('username')
         pass1 = request.POST.get('pass')
-        print(username,pass1)
+        
         user = authenticate(request,username = username,password = pass1)
         if user is not None:
             login(request,user)
@@ -225,7 +225,7 @@ def Contact_page(request):
         )
         new_message.save()
         messages.success(request, "Message sent successfully! Our team will contact you within 10 minutes.")
-        print("sended")
+        
 
         return redirect('contact')
     
@@ -249,8 +249,7 @@ def recipe_suggestions(request):
         model = genai.GenerativeModel("gemini-1.5-flash")
         response = model.generate_content("Generate a list of 1 recipes with their names, descriptions, and YouTube video links. recipes want to include vegetables or fruits or juices or Dried fruits generates formats the data Adhere strictly to the given JSON Format")
 
-        # Log the raw response from the model
-        print("Raw response:", response.text)
+        
 
         # Parse the response
         recipes =extract_json_from_text(response.text)
@@ -264,7 +263,7 @@ def recipe_suggestions(request):
             return JsonResponse({'error': 'No recipes generated.'}, status=500)
 
     except json.JSONDecodeError:
-        print("Failed to decode JSON: ", response.text)
+        
         return JsonResponse({'error': 'Response is not valid JSON.'}, status=500)
     except Exception as e:
         print(f"Error: {e}")

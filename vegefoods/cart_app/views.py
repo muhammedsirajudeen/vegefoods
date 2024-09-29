@@ -37,7 +37,7 @@ def add_to_cart(request):
             
         cart_item, created = CartItem.objects.get_or_create(cart=cart, product=product)
         if not created:
-            cart_item.quantity += int(quantity)  # If it exists, update the quantity
+            cart_item.quantity += int(quantity)  
         else:
             cart_item.quantity = int(quantity)  # If it's a new item, set the quantity
 
@@ -57,13 +57,13 @@ def update_quantity(request):
         cart = get_object_or_404(Cart, user=request.user)
         cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)
 
-        print(f"Current Quantity: {cart_item.quantity}")
+        
         
 
         if quantity > 0:
             cart_item.quantity = float(quantity)
             cart_item.save()
-            print(f"afersaving: {quantity}")
+            
             return JsonResponse({'success': True})
         else:
             return JsonResponse({'success': False, 'message': 'Invalid quantity'})
@@ -73,10 +73,10 @@ def update_quantity(request):
 
 def remove_from_cart(request, product_id):
     if request.method == 'POST' and request.user.is_authenticated:
-        cart = get_object_or_404(Cart, user=request.user)  # Get or create the cart for the user
-        cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id)  # Get the specific cart item
+        cart = get_object_or_404(Cart, user=request.user)  
+        cart_item = get_object_or_404(CartItem, cart=cart, product_id=product_id) 
 
-        cart_item.delete()  # Remove the item from the cart
+        cart_item.delete() 
 
         return JsonResponse({'success': True})
     return JsonResponse({'success': False, 'message': 'User not authenticated or invalid request'})

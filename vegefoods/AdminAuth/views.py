@@ -65,7 +65,7 @@ def panel(request):
 
     top_categories = OrderItem.objects.values('product__category__category_name').annotate(
         total_quantity_sold=Sum('quantity')
-    ).order_by('-total_quantity_sold')[:5]  # Limit to top 5 categories
+    ).order_by('-total_quantity_sold')[:5]  
     
     categories = [category['product__category__category_name'] for category in top_categories]
     quantities = [category['total_quantity_sold'] for category in top_categories]
@@ -110,7 +110,8 @@ def admin_logout(request):
     return redirect('admin_login')
 
 def ledger_book_view(request):
-    # Fetch all orders along with their associated items
+    if not request.user.is_authenticated or not request.user.is_superuser:  
+        return redirect('admin_login') 
     total_sales_price = Order.objects.aggregate(Sum('total_price'))['total_price__sum'] or 0
     total_sales_delivered = OrderItem.objects.filter(status='Delivered').aggregate(
         total=Sum('subtotal_price'))['total'] or 0
@@ -152,12 +153,11 @@ def ledger_book_view(request):
 
 
 def get_monthly_orders(request, year):
-    # Query to count orders by month
+  
     orders = Order.objects.filter(created_at__year=year).annotate(
         month=ExtractMonth('created_at')
     ).values('month').annotate(count=Count('id')).order_by('month')
-    
-    # Prepare data for each month
+
     monthly_data = [0] * 12
     for order in orders:
         monthly_data[order['month'] - 1] = order['count']
@@ -168,6 +168,8 @@ def get_monthly_orders(request, year):
     })
 
 def complaint_message(request):
+    if not request.user.is_authenticated or not request.user.is_superuser: 
+        return redirect('admin_login')
     messages = Message.objects.all()
     messages_count = Message.objects.count()
     pending_message_count = Message.objects.filter(status='pending').count()
@@ -181,6 +183,6 @@ def complaint_message(request):
 
 def change_message_status(request, message_id):
     message = get_object_or_404(Message, id=message_id)
-    message.status = 'solved'  # Make sure the status value matches the choice (in lowercase)
+    message.status = 'solved'  
     message.save()
-    return redirect('messages')  # Replace 'messages' with the correct URL name for your view that displays the table
+    return redirect('messages') 

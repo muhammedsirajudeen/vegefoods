@@ -63,6 +63,9 @@
                         <div class="form-group mb-4">
                             <input type="text" class="form-control" id="phone" name="phone" placeholder="Phone Number" pattern="[0-9]{10}" required>
                         </div>
+
+                        {% if user.is_authenticated %}
+
                         <div class="form-group mb-4">
                             <select name="complaint_subject" id="complaint_subject" class="form-select custom-select" required>
                                 <option value="" disabled selected>Select Complaint Subject</option>
@@ -76,18 +79,30 @@
                                 <option value="Other">Other</option>
                             </select>
                         </div>
+                        {% else %}
+                        <div class="form-group mb-4">
+                            <select name="complaint_subject" id="complaint_subject" class="form-select custom-select" required>
+                                <option value="" disabled selected>Select Complaint Subject</option>
+                                
+                                <option value="Unable to Access Account">Unable to Access Account</option>
+                                <option value="Account Locked">Account Locked</option>
+                                <option value="Login Issues">Login Issues</option>
+                                <option value="Password Reset Assistance">Password Reset Assistance</option>
+                                <option value="Account Verification Problem">Account Verification Problem</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        {% endif %}
                         <div class="form-group mb-4">
                             <textarea name="message" id="message" cols="30" rows="7" class="form-control" placeholder="Your Message" required></textarea>
                         </div>
-                        {% if user.is_authenticated %}
+                        
                         <div class="form-group">
                             <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5 w-100">
                         </div>
-                        {% else %}
-                        <div class="form-group"></div>
-                            <input type="submit" value="Send Message" class="btn btn-primary py-3 px-5 w-100" style="cursor: not-allowed;" disabled>
-                        </div>
-                        {% endif %}
+                        
+                       
+                 
                     </form>
                 </div>
             </div>

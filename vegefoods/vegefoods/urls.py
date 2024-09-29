@@ -32,6 +32,6 @@ urlpatterns = [
     path('wishlist/',include('wishlist_app.urls')),
     path('coupon/',include('coupen_app.urls')),
     path('wallet/',include('wallet.urls')),
-    path('', views.redirect_to_home),  # Redirect root URL to /user/home
+    path('', views.redirect_to_home), 
 ]
 

@@ -27,7 +27,7 @@ from io import BytesIO
 import csv
 import json 
 
-# Razorpay client initialization
+
 razorpay_client = razorpay.Client(auth=(settings.RAZORPAY_KEY_ID, settings.RAZORPAY_KEY_SECRET))
 
 
@@ -41,7 +41,7 @@ def place_order(request):
     subtotal_price = Decimal('0.00')
     cart_items_with_subtotals = []
 
-    # Calculating the item prices based on quantity and category unit
+    
     for item in cart_items:
         quantity = Decimal(item.quantity)
         if item.product.category.category_unit == 'kg':
@@ -61,12 +61,12 @@ def place_order(request):
 
     total_price = subtotal_price + delivery_charge
 
-    # Check for coupon in session
+    
     discount_value = Decimal('0.00')
     coupon_code = request.session.get('coupon_code')
     if coupon_code:
-        discount_value = Decimal(request.session.get('discount_value', '0.00'))  # Get discount from session
-        total_price -= discount_value  # Apply discount to total price
+        discount_value = Decimal(request.session.get('discount_value', '0.00')) 
+        total_price -= discount_value  
 
     if request.method == 'POST':
         selected_address_id = request.POST.get('address')
@@ -104,7 +104,7 @@ def place_order(request):
 
         # Handle Cash on Delivery
         if payment_type == 'Cash on Delivery' and total_price > Decimal('1000.00'):
-            print("not cod")
+            
             return render(request, 'user/checkout.html', {
                 'address': address,
                 'cart_items': cart_items_with_subtotals,
@@ -193,8 +193,7 @@ def place_order(request):
         email_message = EmailMessage(email_subject, email_body, to=[user.email])
         email_message.content_subtype = "html"  
         email_message.send()
-        print("email sends cod")
-
+        
         if 'coupon_code' in request.session:
             del request.session['coupon_code']
         if 'discount_value' in request.session:
@@ -321,7 +320,7 @@ def apply_coupon(request):
             # Parse the JSON body
             data = json.loads(request.body)
             coupon_code = data.get("coupon_code")  # Get the coupon code from the parsed data
-            print("Coupon code:", coupon_code)
+            
 
             # Attempt to get the coupon
             coupon = Coupon.objects.get(code=coupon_code, active=True)
@@ -333,7 +332,7 @@ def apply_coupon(request):
                                # Store the coupon details in the session
                 request.session['coupon_code'] = coupon.code
                 request.session['discount_value'] = str(coupon.discount_value)  # Save as string for session storage
-                print(f"copen siscount in session :{request.session['discount_value']}")
+               
                 return JsonResponse({"success": True})
             else:
                 # Remove coupon details from the session if coupon is invalid
@@ -493,7 +492,7 @@ def update_order_status(request, order_id):
         # Iterate through each order item to update status
         for item in order.items.all():
             new_status = request.POST.get(f'status_{item.id}')
-            print(new_status)
+            
 
             if new_status:
                 # Check if the status is being changed to 'Cancelled' or 'Approve Returned'
@@ -515,7 +514,7 @@ def user_cancel_order_item(request,order_item_id):
         order_item.save()
         try:
             process_refund(order_item)  # You need to implement this function
-            print("order item canceled and refund process")
+            
         except Exception as e:
             print(f"An error occurred while processing the refund: {e}")
     else:
@@ -595,7 +594,7 @@ def user_cancel_order_item(request,order_item_id):
         order_item.status = "Cancelled"
         order_item.save()
         try:
-            process_cancel_refund(order_item)  # You need to implement this function
+            process_cancel_refund(order_item) 
             print("order item canceled and refund process")
         except Exception as e:
             print(f"An error occurred while processing the refund: {e}")
@@ -605,13 +604,13 @@ def user_cancel_order_item(request,order_item_id):
     return redirect('order_details',order_id = order_item.id)
 
 def process_cancel_refund(order_item):
-    # Get the user's wallet
+    
     wallet = get_object_or_404(Wallet, user=order_item.order.user)
     
-    # Calculate the refund amount
+    
     refund_amount = order_item.subtotal_price
 
-    # Create a transaction in the WalletTransaction model
+    
    
     WalletTransation.objects.create(
         wallet=wallet,
@@ -620,7 +619,7 @@ def process_cancel_refund(order_item):
         created_at=timezone.now()
     )
 
-    # Update the wallet balance
+    
     wallet.balance += refund_amount
     wallet.save()
 
@@ -633,7 +632,7 @@ def user_return_order_item(request,order_item_id):
         order_item.return_reason =  return_reason
         order_item.status = 'Requested Return'
         order_item.save()
-        print("return reson saved")
+        
 
     else:
         print("not submimited")
@@ -643,10 +642,10 @@ def user_return_order_item(request,order_item_id):
 
 
 def download_pdf_report(request):
-    # Fetch filtered orders
+    
     orders = _get_filtered_orders(request)
 
-    # Create a PDF response
+    
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="orders_report.pdf"'
 
@@ -654,7 +653,7 @@ def download_pdf_report(request):
     pdf = canvas.Canvas(buffer, pagesize=letter)
     pdf.drawString(100, 750, "Order Report")
 
-    # Add table headers
+    
     pdf.drawString(100, 730, "Order ID")
     pdf.drawString(200, 730, "Order Number")
     pdf.drawString(300, 730, "Customer Name")
@@ -680,10 +679,10 @@ def download_pdf_report(request):
 
 
 def download_excel_report(request):
-    # Fetch filtered orders
+    
     orders = _get_filtered_orders(request)
 
-    # Create a CSV response
+    
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="orders_report.csv"'
 
@@ -701,7 +700,7 @@ def _get_filtered_orders(request):
     start_date = request.GET.get('start_date', None)
     end_date = request.GET.get('end_date', None)
     
-    # Handle filter options
+    
     if filter_option == 'daily':
         today = now().date()
         return Order.objects.filter(created_at__date=today)
@@ -711,16 +710,16 @@ def _get_filtered_orders(request):
     elif filter_option == 'yearly':
         current_year = now().year
         return Order.objects.filter(created_at__year=current_year)
-        # If custom dates are provided, use them regardless of other filters
+        
     elif start_date and end_date:
         try:
-            # Convert start_date and end_date to datetime objects
+            
             start_date = datetime.strptime(start_date, "%Y-%m-%d").date()
             end_date = datetime.strptime(end_date, "%Y-%m-%d").date()
-            print(start_date,end_date)
+            
             return Order.objects.filter(created_at__date__gte=start_date, created_at__date__lte=end_date)
         except ValueError:
-            # Return empty queryset if date conversion fails
+            
             return Order.objects.none()
     else:
         return Order.objects.all()
@@ -731,17 +730,17 @@ def retry_payment(request, order_id):
     
     # Create a Razorpay order
     razorpay_order = razorpay_client.order.create({
-        "amount": int(order.total_price * 100),  # Amount in paise (multiply by 100)
+        "amount": int(order.total_price * 100),  
         "currency": "INR",
-        "payment_capture": "1"  # Auto-capture after payment
+        "payment_capture": "1"  
     })
     print(razorpay_order)
-    # Pass order details and Razorpay order to the template
+    
     context = {
         "order": order,
         "razorpay_order_id": razorpay_order['id'],
-        "razorpay_key": settings.RAZORPAY_KEY_ID,  # Public Key
-        "amount": order.total_price * 100,  # Amount in paise
+        "razorpay_key": settings.RAZORPAY_KEY_ID,  
+        "amount": order.total_price * 100,  
     }
     
     return render(request, 'user/razorpay/retry_payment.html', context)
@@ -750,37 +749,37 @@ def retry_payment(request, order_id):
 def handle_payment(request):
     if request.method == "POST":
         payment_id = request.POST.get('razorpay_payment_id')
-        order_number = request.POST.get('razorpay_order_id')  # Ensure this is the Razorpay order number
+        order_number = request.POST.get('razorpay_order_id')  
         signature = request.POST.get('razorpay_signature')
         db_order_id=request.POST.get('order_id')
         print("ivduthe",db_order_id)
 
         try:
-            # Verify the payment signature
+            
             razorpay_client.utility.verify_payment_signature({
                 'razorpay_order_id': order_number,
                 'razorpay_payment_id': payment_id,
                 'razorpay_signature': signature
             })
 
-            # Retrieve the order using the order_number
-            order = get_object_or_404(Order, id=db_order_id)  # Use order_number
+            
+            order = get_object_or_404(Order, id=db_order_id) 
             order.payment_status = 'Success'
             order.payment_type = 'RazorPay'
             order.save()
 
-            # Deduct stock from the database for the purchased items
+            
             if order.payment_status == 'Success':
                 for item in order.items.all():
                     item.product.available_stock -= item.quantity
                     item.product.save()
 
-            # Redirect the user to the order list page after successful payment
+            
             return redirect('order_list')
 
         except razorpay.errors.SignatureVerificationError:
             return JsonResponse({'status': 'Payment verification failed'})
         except Exception as e:
-            print("Error:", e)  # Log any unexpected errors
+            print("Error:", e)
 
     return JsonResponse({'status': 'Invalid request'})
