@@ -1,21 +1,21 @@
-
-
 document.addEventListener('DOMContentLoaded', function () {
     const chatIcon = document.getElementById('chatbot-icon');
     const chatSection = document.getElementById('chat-section');
     const closeChatButton = document.getElementById('close-chat');
-
-   
+    console.log("dfsajkjasf");
+    
+    // Show chat section on icon click
     chatIcon.addEventListener('click', function () {
         chatSection.style.display = chatSection.style.display === 'none' ? 'block' : 'none';
     });
 
+    // Hide chat section on close button click
     closeChatButton.addEventListener('click', function () {
         chatSection.style.display = 'none';
     });
 });
 
-
+// Function to display user's selected message
 function showUserMessage(message) {
     const responseDiv = document.getElementById('response');
     const userMessageHTML = `
@@ -28,11 +28,11 @@ function showUserMessage(message) {
         
     `;
     responseDiv.insertAdjacentHTML('beforeend', userMessageHTML);
-    responseDiv.scrollTop = responseDiv.scrollHeight;
+    responseDiv.scrollTop = responseDiv.scrollHeight; // Scroll to the latest message
 }
 
 function fetchWalletBalance() {
-    showUserMessage("Wallet Balance");
+    showUserMessage("Wallet Balance"); // Display the user's selection as a user-side message
 
     fetch('/user/api/wallet-balance/')
         .then(response => {
@@ -50,14 +50,14 @@ function fetchWalletBalance() {
                         <p class="small p-2 mb-1 rounded-3 bg-body-tertiary" style="font-size: 1rem;">Your current wallet balance is:  ₹${data.balance}</p>
                          <!-- Feedback buttons -->
         <div class="d-flex">
-            <button class="btn btn-outline-success me-2" onclick="handleFeedback('helpful')">👍 Helpful</button>
-            <button class="btn btn-outline-danger" onclick="handleFeedback('dislike')">👎 Dislike</button>
+            <button class="btn btn-outline-success me-2" onclick="handleFeedback('helpful')"> Helpful</button>
+            <button class="btn btn-outline-danger" onclick="handleFeedback('dislike')"> Dislike</button>
         </div>
                     </div>
                 </div>
             `;
             responseDiv.insertAdjacentHTML('beforeend', botMessageHTML);
-            responseDiv.scrollTop = responseDiv.scrollHeight; 
+            responseDiv.scrollTop = responseDiv.scrollHeight; // Scroll to the latest message
         })
         .catch(error => console.error('Error fetching wallet balance:', error));
 }
@@ -65,7 +65,7 @@ function fetchWalletBalance() {
 
 
 function showCustomerCareMessage() {
-    showUserMessage("Customer Care Support"); 
+    showUserMessage("Customer Care Support"); // Display the user's selection
 
     const responseDiv = document.getElementById('response');
     const botMessageHTML = `
@@ -86,7 +86,7 @@ function showCustomerCareMessage() {
 }
 
 function showReturnPolicy() {
-    showUserMessage("Return Policy");
+    showUserMessage("Return Policy"); // Display the user's selection
 
     const responseDiv = document.getElementById('response');
     const botMessageHTML = `
@@ -122,7 +122,7 @@ function handleFeedback(type) {
     displayFeedbackMessage(message);
 }
 
-
+// Function to display feedback message
 function displayFeedbackMessage(message) {
     const feedbackContainer = document.createElement('div');
     feedbackContainer.className = 'd-flex flex-row justify-content-start mb-4';
@@ -133,6 +133,7 @@ function displayFeedbackMessage(message) {
         </div>
     `;
 
+    // Append the feedback message to the chat container
     document.querySelector('#chat2 .card-body').appendChild(feedbackContainer);
 }
 document.getElementById('close-chat').addEventListener('click', function() {
@@ -146,7 +147,7 @@ document.getElementById('close-chat').addEventListener('click', function() {
 function fetchRecipeSuggestions() {
     showUserMessage("Recipe Suggestions");
 
-  
+    // Make the AJAX request to the Django API endpoint
     fetch('/user/api/recipe-suggestions/')
         .then(response => {
             if (!response.ok) {
@@ -155,20 +156,21 @@ function fetchRecipeSuggestions() {
             return response.json();
         })
         .then(data => {
+            // Clear previous messages
+            // (You can decide to clear the messages or keep them as needed)
 
-
-           
+            // Check if there are recipes in the response
             if (data.recipes && Array.isArray(data.recipes) && data.recipes.length > 0) {
-          
+                // Create HTML to display all recipes
                 const recipesHtml = data.recipes.map(recipe => `
                        <div class="alert alert-light mb-3" role="alert">
                     <h5 class="alert-heading">${recipe.name}</h5>
                     <p>${recipe.description}</p>
                     <a href="${recipe.video_link}" target="_blank" class="btn btn-link">Watch Recipe Video</a>
                 </div>
-                `).join('');
+                `).join('');  // Combine all recipe HTML into a single string
 
-                displayFeedbackMessage(recipesHtml); 
+                displayFeedbackMessage(recipesHtml); // Display all recipes as a feedback message
             } else {
                 displayFeedbackMessage('No recipes found.');
             }
