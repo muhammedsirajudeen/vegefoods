@@ -29,6 +29,10 @@ import json
 def redirect_to_home(request):
     return redirect('home')
 
+def handle_not_found(request,exception):
+    
+    return render(request,'user/404page/404.html')
+
 def count_cart(request):
     user = request.user
     if user.is_authenticated:
