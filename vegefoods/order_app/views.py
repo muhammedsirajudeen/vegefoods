@@ -37,6 +37,7 @@ def place_order(request):
     address = Address.objects.filter(user=user)
     cart = Cart.objects.get(user=user)
     cart_items = CartItem.objects.filter(cart=cart)
+    list_coupen = Coupon.objects.all()
 
     subtotal_price = Decimal('0.00')
     cart_items_with_subtotals = []
@@ -207,7 +208,8 @@ def place_order(request):
         'cart': cart,
         'subtotal_price': subtotal_price,
         'delivery_charge': delivery_charge,
-        'total_price': total_price
+        'total_price': total_price,
+        'list_coupen':list_coupen
     })
 
 
