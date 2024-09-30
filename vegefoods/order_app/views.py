@@ -91,7 +91,7 @@ def place_order(request):
             request.session['selected_address'] = selected_address_id
 
             razorpay_order = razorpay_client.order.create({
-                'amount': int(Decimal(total_price) * Decimal('100')),  # amount in paisa
+                'amount': int(Decimal(total_price) * Decimal('100')),  
                 'currency': 'INR',
                 'payment_capture': '1'
             })
@@ -518,9 +518,9 @@ def user_cancel_order_item(request,order_item_id):
             process_refund(order_item)  # You need to implement this function
             
         except Exception as e:
-            print(f"An error occurred while processing the refund: {e}")
+            pass
     else:
-        print("order cannot canncel")
+        pass
 
     return redirect('order_details',order_id = order_item.id)
 
@@ -597,11 +597,11 @@ def user_cancel_order_item(request,order_item_id):
         order_item.save()
         try:
             process_cancel_refund(order_item) 
-            print("order item canceled and refund process")
+            
         except Exception as e:
-            print(f"An error occurred while processing the refund: {e}")
+            pass
     else:
-        print("order cannot canncel")
+        pass
 
     return redirect('order_details',order_id = order_item.id)
 
@@ -637,7 +637,7 @@ def user_return_order_item(request,order_item_id):
         
 
     else:
-        print("not submimited")
+        pass
 
     return redirect('order_list')
 
@@ -736,7 +736,7 @@ def retry_payment(request, order_id):
         "currency": "INR",
         "payment_capture": "1"  
     })
-    print(razorpay_order)
+    
     
     context = {
         "order": order,
@@ -754,7 +754,7 @@ def handle_payment(request):
         order_number = request.POST.get('razorpay_order_id')  
         signature = request.POST.get('razorpay_signature')
         db_order_id=request.POST.get('order_id')
-        print("ivduthe",db_order_id)
+        
 
         try:
             
@@ -782,6 +782,6 @@ def handle_payment(request):
         except razorpay.errors.SignatureVerificationError:
             return JsonResponse({'status': 'Payment verification failed'})
         except Exception as e:
-            print("Error:", e)
+            pass
 
     return JsonResponse({'status': 'Invalid request'})

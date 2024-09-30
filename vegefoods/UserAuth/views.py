@@ -270,7 +270,7 @@ def recipe_suggestions(request):
         
         return JsonResponse({'error': 'Response is not valid JSON.'}, status=500)
     except Exception as e:
-        print(f"Error: {e}")
+        
         return JsonResponse({'error': 'Failed to generate recipes.'}, status=500)
 
 
@@ -284,7 +284,7 @@ def extract_json_from_text(text):
             json_data = json.loads(json_str)  # Convert string to JSON (Python dictionary)
             return json_data
         except json.JSONDecodeError:
-            print("Invalid JSON format")
+            pass
     else:
-        print("No JSON found")
+        pass
     return None
