@@ -1,0 +1,44 @@
+
+services:
+  app:
+    build: .
+    container_name: my_app
+    ports:
+      - "8000:8000"
+    environment:
+      - ENV_VAR=value
+      - DB_NAME=vegefoods
+      - DB_USER=postgres
+      - DB_PASSWORD=qwerty
+      - DB_HOST=db  # Referring to the PostgreSQL service by name
+      - DB_PORT=5432
+    volumes:
+      - .:/app
+    depends_on:
+      - db
+    networks:
+      - my_network  # Adding to the custom network
+    restart: unless-stopped
+
+  db:
+    image: postgres:13  # You can change the version as needed
+    container_name: postgres_db
+    environment:
+      - POSTGRES_DB=vegefoods
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=qwerty
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - my_network  # Adding to the custom network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+    driver: local
+
+networks:
+  my_network:
+    driver: bridge  # Custom network using bridge driver
